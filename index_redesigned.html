@@ -1,0 +1,2548 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>경리업무를잘하는청년들 - 서비스 소개서 생성</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Pretendard:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy: #1a2e4c;
+            --navy-light: #2d4a6f;
+            --navy-dark: #0f1d30;
+            --navy-pale: #e8eef5;
+            --accent: #3b7dd8;
+            --accent-light: #5a9ae8;
+            --text: #2c3e50;
+            --text-light: #5a6c7d;
+            --text-lighter: #8899a8;
+            --bg: #f5f7fa;
+            --bg-dark: #e9ecf0;
+            --white: #ffffff;
+            --border: #d1d9e3;
+            --border-light: #e5eaf0;
+            --success: #27ae60;
+            --warning: #e67e22;
+            --ai-purple: #7c3aed;
+            --shadow-sm: 0 1px 3px rgba(26, 46, 76, 0.08);
+            --shadow: 0 2px 8px rgba(26, 46, 76, 0.12);
+            --shadow-lg: 0 4px 16px rgba(26, 46, 76, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Pretendard', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            min-height: 100vh;
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        /* 헤더 */
+        .app-header {
+            background: var(--navy);
+            color: white;
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .app-header .logo {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .app-header .logo span {
+            color: var(--accent-light);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .header-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .header-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .header-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .api-status {
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .api-status.connected {
+            background: var(--success);
+        }
+
+        /* 메인 레이아웃 */
+        .main-container {
+            display: flex;
+            min-height: calc(100vh - 60px);
+        }
+
+        /* 사이드바 - 입력 패널 */
+        .sidebar {
+            width: 400px;
+            background: var(--white);
+            border-right: 1px solid var(--border);
+            padding: 24px;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .sidebar-section {
+            margin-bottom: 28px;
+        }
+
+        .sidebar-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .sidebar-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--navy);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--navy);
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.2s;
+            background: var(--white);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(59, 125, 216, 0.12);
+        }
+
+        /* AI 파일 업로드 영역 */
+        .ai-upload-section {
+            background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+            border: 2px dashed var(--ai-purple);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .ai-upload-section:hover {
+            background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
+        }
+
+        .ai-upload-section.dragging {
+            background: #ddd6fe;
+            border-color: #7c3aed;
+        }
+
+        .ai-upload-section .ai-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .ai-upload-section h4 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--ai-purple);
+            margin-bottom: 6px;
+        }
+
+        .ai-upload-section p {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-bottom: 12px;
+        }
+
+        .ai-upload-section input[type="file"] {
+            display: none;
+        }
+
+        .ai-upload-btn {
+            background: var(--ai-purple);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .ai-upload-btn:hover {
+            background: #6d28d9;
+        }
+
+        .ai-upload-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .file-info {
+            margin-top: 12px;
+            padding: 10px 14px;
+            background: white;
+            border-radius: 6px;
+            font-size: 12px;
+            color: var(--text);
+            display: none;
+        }
+
+        .file-info.show {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .file-info .file-name {
+            font-weight: 600;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 200px;
+        }
+
+        .file-info .remove-file {
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        /* 섹션 설명 */
+        .section-desc {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed var(--border-light);
+        }
+
+        /* 서비스 카테고리 구분 */
+        .service-category {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--navy);
+            background: var(--navy-pale);
+            padding: 6px 10px;
+            margin: 8px 0 4px 0;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .service-category:first-child {
+            margin-top: 0;
+        }
+
+        /* 추천 서비스 그룹 */
+        .recommended-group {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .recommended-group .checkbox-item {
+            padding: 8px 12px;
+        }
+
+        .recommended-group .checkbox-item.recommended {
+            border-left: 3px solid var(--ai-purple);
+        }
+
+        .recommended-group .checkbox-item.recommended.checked {
+            background: #f5f3ff;
+            border-color: var(--ai-purple);
+        }
+
+        /* AI 분석 결과 */
+        .ai-result {
+            background: #f0fdf4;
+            border: 1px solid #86efac;
+            border-radius: 8px;
+            padding: 14px;
+            margin-top: 12px;
+            display: none;
+        }
+
+        .ai-result.show {
+            display: block;
+        }
+
+        .ai-result h5 {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--success);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .ai-result p {
+            font-size: 12px;
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .ai-result .extracted-info {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed #86efac;
+        }
+
+        .ai-result .info-item {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 4px;
+            font-size: 12px;
+        }
+
+        .ai-result .info-label {
+            font-weight: 600;
+            color: var(--text-light);
+            min-width: 60px;
+        }
+
+        /* 로딩 스피너 */
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+        }
+
+        .spinner.dark {
+            border-color: rgba(0,0,0,0.1);
+            border-top-color: var(--ai-purple);
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* 체크박스 그룹 */
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 12px 14px;
+            background: var(--bg);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .checkbox-item:hover {
+            background: var(--navy-pale);
+            border-color: var(--accent);
+        }
+
+        .checkbox-item.checked {
+            background: var(--navy-pale);
+            border-color: var(--navy);
+        }
+
+        .checkbox-item.ai-recommended {
+            border-color: var(--ai-purple);
+            background: #f5f3ff;
+        }
+
+        .checkbox-item.ai-recommended::after {
+            content: 'AI 추천';
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 10px;
+            background: var(--ai-purple);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .checkbox-item {
+            position: relative;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-top: 2px;
+            accent-color: var(--navy);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .checkbox-item .checkbox-content {
+            flex: 1;
+        }
+
+        .checkbox-item .checkbox-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 2px;
+        }
+
+        .checkbox-item .checkbox-desc {
+            font-size: 12px;
+            color: var(--text-light);
+            line-height: 1.5;
+        }
+
+        /* 버튼 */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--navy);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--navy-light);
+        }
+
+        .btn-secondary {
+            background: var(--bg-dark);
+            color: var(--text);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #219a52;
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* 미리보기 영역 */
+        .preview-area {
+            flex: 1;
+            padding: 32px;
+            background: var(--bg-dark);
+            overflow-y: auto;
+        }
+
+        .preview-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .preview-header h2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--navy);
+        }
+
+        .preview-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* 문서 컨테이너 */
+        .document-wrapper {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .document {
+            background: var(--white);
+            border-radius: 8px;
+            box-shadow: var(--shadow-lg);
+            padding: 56px 64px;
+            min-height: 600px;
+        }
+
+        /* 문서 헤더 */
+        .doc-header {
+            text-align: center;
+            margin-bottom: 48px;
+            padding-bottom: 32px;
+            border-bottom: 2px solid var(--navy);
+        }
+
+        .doc-badge {
+            display: inline-block;
+            background: var(--navy);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+        }
+
+        .doc-header h1 {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--navy);
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+
+        .doc-header .subtitle {
+            font-size: 15px;
+            color: var(--text-light);
+        }
+
+        .doc-client {
+            margin-top: 24px;
+            padding: 16px 28px;
+            background: var(--navy-pale);
+            border-radius: 8px;
+            display: inline-block;
+        }
+
+        .doc-client .client-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--navy);
+        }
+
+        .doc-client .client-suffix {
+            font-size: 15px;
+            color: var(--text-light);
+            margin-top: 4px;
+        }
+
+        /* 섹션 */
+        .doc-section {
+            margin-bottom: 40px;
+        }
+
+        .doc-section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .doc-section-title .icon {
+            width: 32px;
+            height: 32px;
+            background: var(--navy);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+        }
+
+        .doc-content {
+            color: var(--text);
+            line-height: 1.8;
+            font-size: 14px;
+        }
+
+        .doc-content p {
+            margin-bottom: 14px;
+        }
+
+        .doc-content strong {
+            color: var(--navy);
+            font-weight: 600;
+        }
+
+        /* 서비스 그룹 */
+        .service-group {
+            margin-bottom: 32px;
+        }
+
+        .service-group-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .service-group-title .count {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-light);
+        }
+
+        .service-group-desc {
+            font-size: 14px;
+            color: var(--text-light);
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px dashed var(--border-light);
+        }
+
+        .recommended-group-doc {
+            background: #faf5ff;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #e9d5ff;
+        }
+
+        /* 서비스 박스 */
+        .service-box {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .service-box.recommended {
+            border-left: 4px solid var(--ai-purple);
+            background: #fefcff;
+        }
+
+        .service-box.requested {
+            border-left: 4px solid var(--navy);
+        }
+
+        .service-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .service-icon {
+            font-size: 24px;
+        }
+
+        .service-header h4 {
+            flex: 1;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--navy);
+            margin: 0;
+        }
+
+        .service-badge {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .badge-requested {
+            background: var(--navy-pale);
+            color: var(--navy);
+        }
+
+        .badge-recommended {
+            background: #f3e8ff;
+            color: var(--ai-purple);
+        }
+
+        .detail-text {
+            font-size: 13px;
+            line-height: 1.8;
+            color: var(--text);
+        }
+
+        .sample-report {
+            background: var(--navy-pale);
+            padding: 12px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            color: var(--navy);
+            margin-top: 12px;
+            font-weight: 500;
+        }
+
+        .service-box:last-child {
+            margin-bottom: 0;
+        }
+
+        .service-box h4 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 14px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed var(--border);
+        }
+
+        .service-box .info-row {
+            display: flex;
+            margin-bottom: 10px;
+            gap: 12px;
+        }
+
+        .service-box .info-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .service-box .info-label {
+            width: 80px;
+            font-weight: 600;
+            color: var(--navy-light);
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+
+        .service-box .info-value {
+            color: var(--text);
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .service-box .example {
+            background: var(--white);
+            padding: 12px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            color: var(--text-light);
+            margin-top: 10px;
+            border-left: 3px solid var(--navy);
+        }
+
+        /* 하이라이트 박스 */
+        .highlight-box {
+            background: var(--navy-pale);
+            border-left: 4px solid var(--navy);
+            padding: 20px 24px;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
+        }
+
+        .highlight-box h4 {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 8px;
+        }
+
+        .highlight-box p {
+            margin: 0;
+            color: var(--text);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        /* 프로세스 */
+        .process-flow {
+            display: flex;
+            justify-content: space-between;
+            margin: 28px 0;
+            gap: 8px;
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+
+        .process-step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+
+        .process-step:not(:last-child)::after {
+            content: '→';
+            position: absolute;
+            right: -14px;
+            top: 30px;
+            color: var(--navy);
+            font-size: 18px;
+        }
+
+        .process-step .step-num {
+            width: 44px;
+            height: 44px;
+            background: var(--navy);
+            color: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0 auto 10px;
+        }
+
+        .process-step .step-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--navy);
+            margin-bottom: 4px;
+        }
+
+        .process-step .step-desc {
+            font-size: 11px;
+            color: var(--text-light);
+            line-height: 1.5;
+        }
+
+        /* 가격 강조 */
+        .price-banner {
+            background: var(--navy);
+            color: white;
+            text-align: center;
+            padding: 28px 32px;
+            border-radius: 8px;
+            margin: 28px 0;
+        }
+
+        .price-banner h3 {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .price-banner p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        /* CTA */
+        .cta-box {
+            background: var(--navy-light);
+            color: white;
+            text-align: center;
+            padding: 32px;
+            border-radius: 8px;
+            margin-top: 32px;
+        }
+
+        .cta-box h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .cta-box p {
+            font-size: 14px;
+            opacity: 0.95;
+            line-height: 1.8;
+        }
+
+        /* 푸터 */
+        .doc-footer {
+            margin-top: 48px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .doc-footer .company {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--navy);
+            margin-bottom: 8px;
+        }
+
+        .doc-footer .info {
+            font-size: 13px;
+            color: var(--text-light);
+        }
+
+        .doc-footer .ceo {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        /* 리스트 */
+        .styled-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .styled-list li {
+            padding: 10px 0 10px 20px;
+            position: relative;
+            border-bottom: 1px dashed var(--border-light);
+        }
+
+        .styled-list li:last-child {
+            border-bottom: none;
+        }
+
+        .styled-list li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: var(--navy);
+            font-weight: bold;
+        }
+
+        /* 편집 모드 */
+        .edit-mode [data-editable] {
+            outline: 2px dashed transparent;
+            border-radius: 4px;
+            transition: all 0.2s;
+            min-height: 1em;
+        }
+
+        .edit-mode [data-editable]:hover {
+            outline-color: var(--accent);
+            background: rgba(59, 125, 216, 0.05);
+        }
+
+        .edit-mode [data-editable]:focus {
+            outline-color: var(--navy);
+            outline-style: solid;
+            background: #fffde7;
+        }
+
+        /* 빈 상태 */
+        .empty-state {
+            text-align: center;
+            padding: 80px 40px;
+            color: var(--text-light);
+        }
+
+        .empty-state .icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        /* 모달 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+                background: white;
+            border-radius: 12px;
+            padding: 28px;
+            width: 90%;
+            max-width: 440px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 16px;
+        }
+
+        .modal .form-group {
+            margin-bottom: 16px;
+        }
+
+        .modal .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal .modal-actions .btn {
+            flex: 1;
+        }
+
+        /* 저장 상태 */
+        .save-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            background: #f0f7f0;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+        }
+
+        .save-status.saving {
+            background: #fff8e1;
+            color: #f57c00;
+            border-color: #ffe082;
+        }
+
+        .save-status.saved {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-color: #a5d6a7;
+        }
+
+        .save-icon {
+            font-size: 16px;
+        }
+
+        .save-status.saving .save-icon {
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* 토스트 */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--navy);
+            color: white;
+            padding: 14px 20px;
+            border-radius: 8px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            background: var(--success);
+        }
+
+        .toast.error {
+            background: #ef4444;
+        }
+
+        .toast.ai {
+            background: var(--ai-purple);
+        }
+
+        /* 선택 카운트 */
+        .selection-count {
+            background: var(--navy-pale);
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: var(--navy);
+            display: flex;
+            align-items: center;
+                gap: 8px;
+            }
+
+        .selection-count strong {
+            color: var(--accent);
+        }
+
+        /* 프린트/PDF 스타일 */
+        @media print {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            
+            @page {
+                size: A4 landscape;
+                margin: 10mm 12mm;
+            }
+            
+            html, body {
+                width: 100% !important;
+                height: auto !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                background: white !important;
+                font-size: 11pt !important;
+            }
+            
+            .app-header, 
+            .sidebar, 
+            .preview-header,
+            .toast { 
+                display: none !important; 
+            }
+            
+            .main-content {
+                margin-left: 0 !important;
+                width: 100% !important;
+                padding: 0 !important;
+            }
+            
+            .preview-area { 
+                padding: 0 !important; 
+                background: white !important; 
+            }
+            
+            .document { 
+                box-shadow: none !important; 
+                border-radius: 0 !important; 
+                padding: 0 !important;
+                margin: 0 !important;
+                max-width: 100% !important;
+                width: 100% !important;
+            }
+            
+            .edit-mode [data-editable] { 
+                outline: none !important; 
+            }
+            
+            /* 서비스 박스 인쇄 최적화 */
+            .service-box {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                margin-bottom: 15px !important;
+                border: 1px solid #ddd !important;
+            }
+            
+            .service-group {
+                page-break-before: auto;
+            }
+            
+            .service-group:not(:first-child) {
+                page-break-before: always;
+            }
+            
+            /* 모든 배경색 인쇄 시 유지 */
+            .doc-badge,
+            .doc-client,
+            .service-badge,
+            .sample-report,
+            .core-services-grid .service-card,
+            .highlight-box,
+            .process-step,
+            .erp-promo,
+            .cta-section,
+            .footer-section {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            
+            .doc-badge {
+                background: #1a365d !important;
+                color: white !important;
+            }
+            
+            .doc-client {
+                background: #ebf4ff !important;
+            }
+            
+            .service-box {
+                background: white !important;
+                border: 1px solid #e2e8f0 !important;
+            }
+            
+            .sample-report {
+                background: #f0fdf4 !important;
+            }
+            
+            .highlight-box {
+                background: #fffbeb !important;
+            }
+            
+            .cta-section {
+                background: #ebf4ff !important;
+            }
+            
+            /* 프로세스 플로우 잘림 방지 */
+            .process-flow {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            
+            .process-step .step-num {
+                background: #1a365d !important;
+                color: white !important;
+            }
+            
+            /* 비용 산정 섹션 전체 잘림 방지 */
+            .doc-section:has(.process-flow) {
+                page-break-inside: avoid !important;
+            }
+            
+            .price-banner {
+                background: #1a365d !important;
+                color: white !important;
+                page-break-inside: avoid !important;
+            }
+            
+            .cta-box {
+                page-break-inside: avoid !important;
+            }
+            
+            /* 인건비/무료체험 문구 같은 페이지에 표시 */
+            .final-cta-group {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+        }
+
+        /* 페이지 브레이크 */
+        .page-break-before { 
+            page-break-before: always; 
+            break-before: page;
+        }
+        .page-break-after { 
+            page-break-after: always; 
+            break-after: page;
+        }
+        .no-break { 
+            page-break-inside: avoid; 
+            break-inside: avoid;
+        }
+        
+
+        /* PDF용 서비스 그리드 - 2열 레이아웃 (A4 가로 최적화) */
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .service-grid .service-box {
+            margin-bottom: 0;
+            padding: 16px 20px;
+            page-break-inside: avoid;
+            break-inside: avoid;
+            box-sizing: border-box;
+        }
+
+        .service-grid .service-header {
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+        }
+
+        .service-grid .service-header h4 {
+            font-size: 15px;
+        }
+
+        .service-grid .service-icon {
+            font-size: 20px;
+        }
+
+        .service-grid .info-row {
+            padding: 6px 0;
+        }
+
+        .service-grid .info-label {
+            font-size: 11px;
+            min-width: 70px;
+        }
+
+        .service-grid .info-value {
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .service-grid .detail-text {
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .service-grid .sample-report {
+            font-size: 11px;
+            padding: 8px 12px;
+            margin-top: 10px;
+        }
+        
+        @media print {
+            .service-grid {
+                display: grid !important;
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 16px !important;
+            }
+        }
+
+        /* 반응형 */
+        @media (max-width: 1024px) {
+            .main-container { flex-direction: column; }
+            .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); max-height: 50vh; }
+            .preview-area { padding: 20px; }
+            .document { padding: 40px 32px; }
+        }
+
+        @media (max-width: 600px) {
+            .app-header { padding: 12px 16px; flex-direction: column; gap: 10px; }
+            .sidebar { padding: 16px; }
+            .document { padding: 32px 24px; }
+            .doc-header h1 { font-size: 24px; }
+            .process-flow { flex-direction: column; gap: 16px; }
+            .process-step:not(:last-child)::after { content: '↓'; position: static; display: block; margin-top: 8px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 헤더 -->
+    <header class="app-header">
+        <div class="logo">주식회사 <span>경리업무를잘하는청년들</span></div>
+        <div class="header-actions">
+            <span style="font-size: 13px; color: rgba(255,255,255,0.8);">서비스 소개서 생성기</span>
+    </div>
+    </header>
+
+    <div class="main-container">
+        <!-- 사이드바 -->
+        <aside class="sidebar">
+            <!-- 기업 정보 -->
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">📋 기업 정보</h3>
+                <div class="form-group">
+                    <label for="companyName">상담 기업명 *</label>
+                    <input type="text" id="companyName" placeholder="예: ABC 주식회사" oninput="updatePreview()">
+                </div>
+                <div class="form-group">
+                    <label for="contactName">담당자/대표자명</label>
+                    <input type="text" id="contactName" placeholder="예: 홍길동 대표님" oninput="updatePreview()">
+                </div>
+                <div class="form-group">
+                    <label for="industryType">업종</label>
+                    <select id="industryType" onchange="updatePreview()">
+                        <option value="">선택 안함</option>
+                        <option value="제조업">제조업</option>
+                        <option value="유통/도매업">유통/도매업</option>
+                        <option value="소매업">소매업</option>
+                        <option value="서비스업">서비스업</option>
+                        <option value="IT/소프트웨어">IT/소프트웨어</option>
+                        <option value="건설업">건설업</option>
+                        <option value="요식업">요식업</option>
+                        <option value="의료/헬스케어">의료/헬스케어</option>
+                        <option value="운송/물류업">운송/물류업</option>
+                        <option value="교육업">교육업</option>
+                        <option value="부동산업">부동산업</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 고객 요청 서비스 -->
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">📌 고객 요청 서비스</h3>
+                <p class="section-desc">고객사에서 필요하다고 요청한 서비스</p>
+                <div class="selection-count" id="requestedCount">
+                    선택: <strong>0개</strong>
+                    </div>
+                <div class="checkbox-group" id="requestedServices">
+                    <!-- 기본 관리 -->
+                    <div class="service-category">기본 관리</div>
+                    <label class="checkbox-item" data-service="accountManagement" data-type="requested">
+                        <input type="checkbox" onchange="toggleService(this, 'accountManagement', 'requested')">
+                        <div class="checkbox-content">
+                            <div class="checkbox-title">🏦 사업용 계좌관리</div>
+                            <div class="checkbox-desc">입출금 모니터링 및 자금흐름 관리</div>
+                        </div>
+                    </label>
+                    <label class="checkbox-item" data-service="cardManagement" data-type="requested">
+                        <input type="checkbox" onchange="toggleService(this, 'cardManagement', 'requested')">
+                        <div class="checkbox-content">
+                            <div class="checkbox-title">💳 등록카드 관리</div>
+                            <div class="checkbox-desc">법인/사업용 카드 사용내역 증빙관리</div>
+                        </div>
+                    </label>
+                    <label class="checkbox-item" data-service="partnerManagement" data-type="requested">
+                        <input type="checkbox" onchange="toggleService(this, 'partnerManagement', 'requested')">
+                        <div class="checkbox-content">
+                            <div class="checkbox-title">👥 거래처 및 직원관리</div>
+                            <div class="checkbox-desc">거래처/직원 정보 체계적 관리</div>
+                        </div>
+                    </label>
+                    <!-- 세금계산서 -->
+                    <div class="service-category">세금계산서</div>
+                    <label class="checkbox-item" data-service="taxInvoiceIssue" data-type="requested">
+                        <input type="checkbox" onchange="toggleService(this, 'taxInvoiceIssue', 'requested')">
+                        <div class="checkbox-content">
+                            <div class="checkbox-title">📄 세금계산서 발행</div>
+                            <div class="checkbox-desc">협의 시간에 일괄 발행</div>
+                        </div>
+                    </label>
+                    <label class="checkbox-item" data-service="taxInvoiceCheck" data-type="requested">
+                        <input type="checkbox" onchange="toggleService(this, 'taxInvoiceCheck', 'requested')">
+                        <div class="checkbox-content">
+                            <div class="checkbox-title">🔍 세금계산서 조회/관리</div>
+                            <div class="checkbox-desc">홈택스 연동 세금계산서 관리</div>
+                        </div>
+                    </label>
+                    <!-- 손익 분석 -->
+                    <div class="service-category">손익 분석</div>
+                    <label class="checkbox-item" data-service="monthlyPL" data-type="requested">
+                        <input type="checkbox" onchange="toggleService(this, 'monthlyPL', 'requested')">
+                        <div class="checkbox-content">
+                            <div class="checkbox-title">📈 월간 손익분석</div>
+                            <div class="checkbox-desc">월별 손익계산서 제공</div>
+                        </div>
+                    </label>
+                    <label class="checkbox-item" data-service="projectPL" data-type="requested">
+                        <input type="checkbox" onchange="toggleService(this, 'projectPL', 'requested')">
+                        <div class="checkbox-content">
+                            <div class="checkbox-title">🏗️ 프로젝트/현장별 손익</div>
+                            <div class="checkbox-desc">프로젝트별 수익률 분석</div>
+                        </div>
+                    </label>
+                    <label class="checkbox-item" data-service="salesManagement" data-type="requested">
+                        <input type="checkbox" onchange="toggleService(this, 'salesManagement', 'requested')">
+                        <div class="checkbox-content">
+                            <div class="checkbox-title">💰 품목별/매출관리</div>
+                            <div class="checkbox-desc">품목/프로젝트별 매출 추적</div>
+                        </div>
+                    </label>
+                    <!-- 자금 관리 -->
+                    <div class="service-category">자금 관리</div>
+                    <label class="checkbox-item" data-service="arApManagement" data-type="requested">
+                        <input type="checkbox" onchange="toggleService(this, 'arApManagement', 'requested')">
+                        <div class="checkbox-content">
+                            <div class="checkbox-title">📋 미수/미지급금 관리</div>
+                            <div class="checkbox-desc">거래처별 채권/채무 관리</div>
+                        </div>
+                    </label>
+                    <label class="checkbox-item" data-service="cashFlowManagement" data-type="requested">
+                        <input type="checkbox" onchange="toggleService(this, 'cashFlowManagement', 'requested')">
+                        <div class="checkbox-content">
+                            <div class="checkbox-title">💵 자금현황 관리</div>
+                            <div class="checkbox-desc">자금일보, 자금계획 관리</div>
+                        </div>
+                    </label>
+                    <label class="checkbox-item" data-service="bankReconciliation" data-type="requested">
+                        <input type="checkbox" onchange="toggleService(this, 'bankReconciliation', 'requested')">
+                        <div class="checkbox-content">
+                            <div class="checkbox-title">🔄 입출금내역 대사</div>
+                            <div class="checkbox-desc">증빙-입출금 매칭 관리</div>
+                        </div>
+                    </label>
+                    <!-- 증빙/세무 -->
+                    <div class="service-category">증빙/세무</div>
+                    <label class="checkbox-item" data-service="documentManagement" data-type="requested">
+                        <input type="checkbox" onchange="toggleService(this, 'documentManagement', 'requested')">
+                        <div class="checkbox-content">
+                            <div class="checkbox-title">📁 증빙관리</div>
+                            <div class="checkbox-desc">모든 증빙 체계적 수집/관리</div>
+                        </div>
+                    </label>
+                    <label class="checkbox-item" data-service="taxSupport" data-type="requested">
+                        <input type="checkbox" onchange="toggleService(this, 'taxSupport', 'requested')">
+                        <div class="checkbox-content">
+                            <div class="checkbox-title">📝 세무신고 보조자료</div>
+                            <div class="checkbox-desc">부가세/원천세 신고 자료</div>
+                        </div>
+                    </label>
+                    <!-- 기타 -->
+                    <div class="service-category">기타 서비스</div>
+                    <label class="checkbox-item" data-service="statementIssue" data-type="requested">
+                        <input type="checkbox" onchange="toggleService(this, 'statementIssue', 'requested')">
+                        <div class="checkbox-content">
+                            <div class="checkbox-title">📃 거래명세표 제작</div>
+                            <div class="checkbox-desc">거래처용 명세표 작성</div>
+                        </div>
+                    </label>
+                    <label class="checkbox-item" data-service="payroll" data-type="requested">
+                        <input type="checkbox" onchange="toggleService(this, 'payroll', 'requested')">
+                        <div class="checkbox-content">
+                            <div class="checkbox-title">💼 급여 정산</div>
+                            <div class="checkbox-desc">급여대장 작성, 원천세 지원</div>
+                        </div>
+                    </label>
+                    <label class="checkbox-item" data-service="customTool" data-type="requested">
+                        <input type="checkbox" onchange="toggleService(this, 'customTool', 'requested')">
+                        <div class="checkbox-content">
+                            <div class="checkbox-title">🛠️ 맞춤 도구 개발</div>
+                            <div class="checkbox-desc">업무 특화 양식/도구 제작</div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- 경청 추천 서비스 -->
+            <div class="sidebar-section">
+                <h3 class="sidebar-title" style="color: var(--ai-purple);">💡 경청 추천 서비스</h3>
+                <p class="section-desc">경청에서 추가로 제안드리는 서비스</p>
+                <div class="selection-count" id="recommendedCount">
+                    선택: <strong>0개</strong>
+                    </div>
+                <div class="checkbox-group recommended-group" id="recommendedServices">
+                    <!-- 동일한 서비스 목록 (추천용) -->
+                    <label class="checkbox-item recommended" data-service="accountManagement" data-type="recommended">
+                        <input type="checkbox" onchange="toggleService(this, 'accountManagement', 'recommended')">
+                        <div class="checkbox-content">
+                            <div class="checkbox-title">🏦 사업용 계좌관리</div>
+                    </div>
+                    </label>
+                    <label class="checkbox-item recommended" data-service="cardManagement" data-type="recommended">
+                        <input type="checkbox" onchange="toggleService(this, 'cardManagement', 'recommended')">
+                        <div class="checkbox-content">
+                            <div class="checkbox-title">💳 등록카드 관리</div>
+                    </div>
+                    </label>
+                    <label class="checkbox-item recommended" data-service="partnerManagement" data-type="recommended">
+                        <input type="checkbox" onchange="toggleService(this, 'partnerManagement', 'recommended')">
+                        <div class="checkbox-content">
+                            <div class="checkbox-title">👥 거래처 및 직원관리</div>
+                    </div>
+                    </label>
+                    <label class="checkbox-item recommended" data-service="taxInvoiceIssue" data-type="recommended">
+                        <input type="checkbox" onchange="toggleService(this, 'taxInvoiceIssue', 'recommended')">
+                        <div class="checkbox-content">
+                            <div class="checkbox-title">📄 세금계산서 발행</div>
+                        </div>
+                    </label>
+                    <label class="checkbox-item recommended" data-service="taxInvoiceCheck" data-type="recommended">
+                        <input type="checkbox" onchange="toggleService(this, 'taxInvoiceCheck', 'recommended')">
+                        <div class="checkbox-content">
+                            <div class="checkbox-title">🔍 세금계산서 조회/관리</div>
+                        </div>
+                    </label>
+                    <label class="checkbox-item recommended" data-service="monthlyPL" data-type="recommended">
+                        <input type="checkbox" onchange="toggleService(this, 'monthlyPL', 'recommended')">
+                        <div class="checkbox-content">
+                            <div class="checkbox-title">📈 월간 손익분석</div>
+                        </div>
+                    </label>
+                    <label class="checkbox-item recommended" data-service="projectPL" data-type="recommended">
+                        <input type="checkbox" onchange="toggleService(this, 'projectPL', 'recommended')">
+                        <div class="checkbox-content">
+                            <div class="checkbox-title">🏗️ 프로젝트/현장별 손익</div>
+                        </div>
+                    </label>
+                    <label class="checkbox-item recommended" data-service="salesManagement" data-type="recommended">
+                        <input type="checkbox" onchange="toggleService(this, 'salesManagement', 'recommended')">
+                        <div class="checkbox-content">
+                            <div class="checkbox-title">💰 품목별/매출관리</div>
+                        </div>
+                    </label>
+                    <label class="checkbox-item recommended" data-service="arApManagement" data-type="recommended">
+                        <input type="checkbox" onchange="toggleService(this, 'arApManagement', 'recommended')">
+                        <div class="checkbox-content">
+                            <div class="checkbox-title">📋 미수/미지급금 관리</div>
+                        </div>
+                    </label>
+                    <label class="checkbox-item recommended" data-service="cashFlowManagement" data-type="recommended">
+                        <input type="checkbox" onchange="toggleService(this, 'cashFlowManagement', 'recommended')">
+                        <div class="checkbox-content">
+                            <div class="checkbox-title">💵 자금현황 관리</div>
+                        </div>
+                    </label>
+                    <label class="checkbox-item recommended" data-service="bankReconciliation" data-type="recommended">
+                        <input type="checkbox" onchange="toggleService(this, 'bankReconciliation', 'recommended')">
+                        <div class="checkbox-content">
+                            <div class="checkbox-title">🔄 입출금내역 대사</div>
+                        </div>
+                    </label>
+                    <label class="checkbox-item recommended" data-service="documentManagement" data-type="recommended">
+                        <input type="checkbox" onchange="toggleService(this, 'documentManagement', 'recommended')">
+                        <div class="checkbox-content">
+                            <div class="checkbox-title">📁 증빙관리</div>
+                        </div>
+                    </label>
+                    <label class="checkbox-item recommended" data-service="taxSupport" data-type="recommended">
+                        <input type="checkbox" onchange="toggleService(this, 'taxSupport', 'recommended')">
+                        <div class="checkbox-content">
+                            <div class="checkbox-title">📝 세무신고 보조자료</div>
+                        </div>
+                    </label>
+                    <label class="checkbox-item recommended" data-service="statementIssue" data-type="recommended">
+                        <input type="checkbox" onchange="toggleService(this, 'statementIssue', 'recommended')">
+                        <div class="checkbox-content">
+                            <div class="checkbox-title">📃 거래명세표 제작</div>
+                        </div>
+                    </label>
+                    <label class="checkbox-item recommended" data-service="payroll" data-type="recommended">
+                        <input type="checkbox" onchange="toggleService(this, 'payroll', 'recommended')">
+                        <div class="checkbox-content">
+                            <div class="checkbox-title">💼 급여 정산</div>
+                        </div>
+                    </label>
+                    <label class="checkbox-item recommended" data-service="customTool" data-type="recommended">
+                        <input type="checkbox" onchange="toggleService(this, 'customTool', 'recommended')">
+                        <div class="checkbox-content">
+                            <div class="checkbox-title">🛠️ 맞춤 도구 개발</div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- 추가 옵션 -->
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">⚙️ 추가 옵션</h3>
+                <div class="checkbox-group">
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="optExistingStaff" onchange="updatePreview()">
+                        <div class="checkbox-content">
+                            <div class="checkbox-title">기존 경리직원 보유</div>
+                            <div class="checkbox-desc">퇴사 리스크 최소화 내용 강조</div>
+                    </div>
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="optErpPromo" onchange="updatePreview()" checked>
+                        <div class="checkbox-content">
+                            <div class="checkbox-title">경리나라 무료체험 안내</div>
+                            <div class="checkbox-desc">3개월 무료체험권 지급 안내 포함</div>
+                    </div>
+                    </label>
+                    </div>
+                </div>
+
+            <!-- 버튼 -->
+            <div class="sidebar-section">
+                <button class="btn btn-primary btn-block" onclick="toggleEditMode()" id="editBtn">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                    내용 편집 모드
+                </button>
+                <div style="height: 10px;"></div>
+                <button class="btn btn-success btn-block" onclick="showPrintButton()" id="pdfBtn">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    📄 PDF 내보내기
+                </button>
+                <div id="printBtnWrapper" style="display: none; margin-top: 10px;">
+                    <button class="btn btn-block" style="background: #2563eb; color: white;" onclick="printDocument()" id="printBtn">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                        🖨️ 인쇄하기 (PDF로 저장)
+                    </button>
+                    <p style="font-size: 11px; color: #666; margin-top: 8px; text-align: center;">
+                        인쇄 대화상자에서<br>"PDF로 저장" 선택
+                    </p>
+                </div>
+                    </div>
+
+            <!-- 저장 상태 -->
+            <div class="sidebar-section" id="saveStatusSection">
+                <div class="save-status" id="saveStatus">
+                    <span class="save-icon">💾</span>
+                    <span class="save-text" id="saveStatusText">수정 내용이 자동 저장됩니다</span>
+                    </div>
+                <button class="btn btn-secondary btn-block" onclick="manualSave()" style="margin-top: 10px;">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:16px;height:16px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+                    수동 저장
+                </button>
+                </div>
+        </aside>
+
+        <!-- 미리보기 영역 -->
+        <main class="preview-area">
+            <div class="preview-header">
+                <h2>📄 미리보기</h2>
+                <div class="preview-actions">
+                    <button class="btn btn-secondary" onclick="resetAll()">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:16px;height:16px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                        초기화
+                    </button>
+                    </div>
+                </div>
+
+            <div class="document-wrapper">
+                <div class="document" id="document">
+                    <!-- 빈 상태 -->
+                    <div class="empty-state" id="emptyState">
+                        <div class="icon">📋</div>
+                        <h3>서비스를 선택해주세요</h3>
+                        <p>왼쪽 패널에서 기업명을 입력하고<br>제공할 서비스를 선택하면<br>미리보기가 표시됩니다.</p>
+                    </div>
+
+                    <!-- 문서 내용 -->
+                    <div id="documentContent" style="display: none;">
+                        <div class="doc-header">
+                            <div class="doc-badge">SERVICE PROPOSAL</div>
+                            <h1 data-editable data-key="doc_title">경리업무 대행 서비스 소개서</h1>
+                            <p class="subtitle" data-editable data-key="doc_subtitle">안정적인 경영 환경 조성을 위한 전문 경리 서비스</p>
+                            <div class="doc-client">
+                                <div class="client-name" id="docClientName">귀사</div>
+                                <div class="client-suffix">를 위한 맞춤 서비스를 제안드립니다</div>
+                </div>
+            </div>
+
+                        <div class="doc-section">
+                            <h2 class="doc-section-title">
+                                <span class="icon">💡</span>
+                                <span>서비스 소개</span>
+                </h2>
+                            <div class="doc-content">
+                                <p data-editable data-key="doc_intro">
+                                    <strong>주식회사 경리업무를잘하는청년들</strong>은 원격으로 경리업무를 대행해드리는 전문 서비스 기업입니다.
+                                    자택근무하는 경리직원을 채용하는 것과 동일한 효과를 누리실 수 있으며, 
+                                    <strong>직접 고용 대비 비용 절감</strong>과 <strong>전문성</strong>을 동시에 확보하실 수 있습니다.
+                                </p>
+                                <div class="highlight-box" id="existingStaffBox" style="display: none;">
+                                    <h4>🎯 기존 경리 직원이 있어도 이용 가능합니다!</h4>
+                                    <p data-editable data-key="doc_existing_staff">퇴사 리스크 최소화, 업무 백업 체계 구축, 전문 업무 분담 등 다양한 형태로 활용하실 수 있습니다.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="doc-section page-break-before" id="selectedServicesSection" style="display: none;">
+                            <h2 class="doc-section-title">
+                                <span class="icon">⚡</span>
+                                <span>제공 서비스 상세</span>
+                            </h2>
+                            <div id="selectedServicesContent"></div>
+                        </div>
+
+                        <div class="doc-section policy-section page-break-before">
+                            <h2 class="doc-section-title">
+                                <span class="icon">💬</span>
+                                <span>업무 소통 및 운영 정책</span>
+                            </h2>
+                            <div class="doc-content">
+                                <p data-editable data-key="doc_policy_intro">저희는 다수의 고객사를 전문적으로 관리하는 아웃소싱 업체로서, 업무 효율과 서비스 품질 유지를 위해 다음과 같은 소통 원칙을 가지고 있습니다.</p>
+                                <ul class="styled-list">
+                                    <li data-editable data-key="doc_policy_1"><strong>비상주 서비스의 특성:</strong> 담당 매니저가 여러 회원사를 동시에 관리하므로, 사내 상주 직원처럼 물리적인 실시간 즉각 대응은 구조적으로 어려울 수 있습니다.</li>
+                                    <li data-editable data-key="doc_policy_2"><strong>유연한 소통:</strong> 전화 상담 및 메신저 소통은 언제든 열려 있으며, 가능한 범위 내에서는 최대한 신속하게 대응해 드립니다.</li>
+                    </ul>
+                </div>
+            </div>
+
+                        <div class="doc-section" id="erpSection" style="display: none;">
+                            <h2 class="doc-section-title">
+                    <span class="icon">🖥️</span>
+                                <span>ERP 시스템 안내</span>
+                </h2>
+                            <div class="highlight-box">
+                                <h4 data-editable data-key="doc_erp_title">🎁 경리나라 3개월 무료체험권 지급!</h4>
+                                <p data-editable data-key="doc_erp_desc">서비스 이용 시 전문 ERP 프로그램 <strong>'경리나라'</strong>를 활용하며, 계약 고객사에 <strong>3개월간 무료체험권</strong>을 지급해 드립니다.</p>
+                </div>
+            </div>
+
+                        <div class="doc-section">
+                            <h2 class="doc-section-title">
+                    <span class="icon">📝</span>
+                                <span>비용 산정 및 계약 절차</span>
+                </h2>
+                            <div class="doc-content">
+                                <p data-editable data-key="doc_cost_intro">경리 업무는 업종과 회사 규모에 따라 업무량의 편차가 큽니다. 따라서 합리적이고 정확한 수수료 산정을 위해 <strong>샘플 테스트 기간</strong>을 운영합니다.</p>
+                </div>
+                <div class="process-flow">
+                    <div class="process-step">
+                                    <div class="step-num">1</div>
+                                    <div class="step-title" data-editable data-key="doc_step1_title">샘플 테스트</div>
+                                    <div class="step-desc" data-editable data-key="doc_step1_desc">약 1~2주<br>실제 업무 수행</div>
+                    </div>
+                    <div class="process-step">
+                                    <div class="step-num">2</div>
+                                    <div class="step-title" data-editable data-key="doc_step2_title">업무 보고</div>
+                                    <div class="step-desc" data-editable data-key="doc_step2_desc">수행 리포트<br>방향성 검증</div>
+                    </div>
+                    <div class="process-step">
+                                    <div class="step-num">3</div>
+                                    <div class="step-title" data-editable data-key="doc_step3_title">최종 견적</div>
+                                    <div class="step-desc" data-editable data-key="doc_step3_desc">업무 범위 확정<br>월 수수료 제안</div>
+                    </div>
+                    <div class="process-step">
+                                    <div class="step-num">4</div>
+                                    <div class="step-title" data-editable data-key="doc_step4_title">정식 계약</div>
+                                    <div class="step-desc" data-editable data-key="doc_step4_desc">계약 체결<br>월 정기 서비스</div>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <h4>📌 서비스 금액 안내</h4>
+                                <p data-editable data-key="doc_price_info">서비스 금액은 귀사의 업무 범위와 내용에 따라 달라지며, 정해진 금액이 없습니다. 샘플 테스트를 통해 실제 투입되는 공수를 파악한 후 합리적인 월 수수료를 제안드립니다.</p>
+                </div>
+            </div>
+
+                        <!-- 인건비/무료체험 문구 묶음 (같은 페이지에 표시) -->
+                        <div class="final-cta-group" style="page-break-inside: avoid; break-inside: avoid;">
+                            <div class="price-banner">
+                                <h3 data-editable data-key="doc_price_banner">💰 인건비보다 무조건 저렴합니다!</h3>
+                                <p data-editable data-key="doc_price_banner_desc">정규직 경리 채용 대비 합리적인 비용으로 전문 서비스를 이용하실 수 있습니다.</p>
+                            </div>
+
+                            <div class="cta-box">
+                            <h3 data-editable data-key="doc_cta_title">🎯 1달 무료 체험으로 직접 확인해보세요!</h3>
+                            <p data-editable data-key="doc_cta_desc">
+                    저희 서비스는 <strong>1달 무료 체험</strong>을 통해 업무 능력을 먼저 확인해보실 수 있습니다.<br>
+                    귀사의 대표님과 충분히 소통하며 업무 방식을 맞춰가고,<br>
+                    이후 계약 의사를 밝혀주시면 서비스 금액을 산정하여 월 정기 결제로 진행됩니다.<br><br>
+                                <strong>부담 없이 경험해보시고, 긍정적으로 검토 부탁드립니다!</strong>
+                                </p>
+                            </div>
+                        </div>
+                        <!-- /final-cta-group -->
+
+                        <div class="doc-footer">
+                            <div class="company" data-editable data-key="doc_company_name">주식회사 경리업무를잘하는청년들</div>
+                <div class="info">
+                                <span class="ceo" data-editable data-key="doc_ceo">대표 금종석</span><br>
+                                <span data-editable data-key="doc_company_desc">원격 경리업무 전문 서비스 기업</span>
+                </div>
+            </div>
+        </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 토스트 -->
+    <div class="toast" id="toast">
+        <span id="toastMessage">저장되었습니다</span>
+    </div>
+
+    <script>
+        // 상태
+        let requestedServices = new Set();  // 고객 요청 서비스
+        let recommendedServices = new Set(); // 경청 추천 서비스
+        let isEditMode = false;
+        let saveTimeout = null;
+
+        // 기본 서비스 데이터 (모듈화)
+        const defaultServiceData = {
+            // === 기본 관리 서비스 ===
+            accountManagement: {
+                category: '기본 관리',
+                title: '사업용 계좌관리',
+                icon: '🏦',
+                method: '사업용 계좌의 입출금 내역을 실시간으로 모니터링하고, 거래 유형별로 분류하여 관리합니다.',
+                detail: '• 계좌별 입출금 현황 일일/주간/월간 리포트 제공\n• 이체 내역과 세금계산서/카드매출 자동 매칭\n• 미확인 입금 알림 및 추적 관리',
+                effect: '자금 흐름을 투명하게 파악하고, 회계 처리 누락을 방지합니다.',
+                sample: '📊 제공 보고서: 계좌별 잔액현황표, 일일 입출금 명세서'
+            },
+            cardManagement: {
+                category: '기본 관리',
+                title: '등록카드 관리',
+                icon: '💳',
+                method: '법인/사업용 카드 사용내역을 수집하고, 적격증빙으로 관리합니다.',
+                detail: '• 카드사별 매출/매입 내역 자동 수집\n• 카드 사용내역과 증빙 매칭\n• 개인경비 vs 법인경비 구분 관리',
+                effect: '카드 사용내역의 적격증빙 확보로 세무 리스크를 최소화합니다.',
+                sample: '📊 제공 보고서: 월별 카드사용 명세서, 부가세 매입자료'
+            },
+            partnerManagement: {
+                category: '기본 관리',
+                title: '거래처 및 직원 관리',
+                icon: '👥',
+                method: '거래처 정보와 직원 정보를 체계적으로 등록하고 관리합니다.',
+                detail: '• 거래처 기본정보 및 담당자 관리\n• 거래처별 거래조건 및 결제조건 관리\n• 직원 기본정보, 급여정보, 입퇴사 관리',
+                effect: '거래처/직원 정보를 한 곳에서 관리하여 업무 효율성을 높입니다.',
+                sample: '📊 제공 자료: 거래처 원장, 직원 마스터'
+            },
+            // === 세금계산서 서비스 ===
+            taxInvoiceIssue: {
+                category: '세금계산서',
+                title: '세금계산서 발행',
+                icon: '📄',
+                method: '업무의 정확성을 위해 실시간 건별 발행이 아닌, 사전에 협의된 시간에 일괄 발행합니다.',
+                detail: '• 발행 요청 접수 및 검증\n• 협의된 시간에 일괄 발행 (예: 매일 오후 5시)\n• 발행 완료 내역 보고',
+                effect: '발행 누락 방지 및 검증 절차로 세무 리스크를 최소화합니다.',
+                sample: '📊 제공 보고서: 일별/월별 발행 내역서'
+            },
+            taxInvoiceCheck: {
+                category: '세금계산서',
+                title: '세금계산서 조회/관리',
+                icon: '🔍',
+                method: '국세청 홈택스와 연동하여 매출/매입 세금계산서를 조회하고 관리합니다.',
+                detail: '• 홈택스 매출/매입 세금계산서 자동 수집\n• 미수취/미발행 세금계산서 체크\n• 세금계산서 vs 입출금 내역 대사',
+                effect: '세금계산서 누락을 방지하고 부가세 신고 정확도를 높입니다.',
+                sample: '📊 제공 보고서: 월별 세금계산서 수취현황표'
+            },
+            // === 매출/손익 관리 ===
+            monthlyPL: {
+                category: '손익 분석',
+                title: '월간 손익분석',
+                icon: '📈',
+                method: '경리나라 데이터를 기반으로 경영 관리를 위한 관리회계용 손익보고서를 매월 제공합니다.',
+                detail: '• 매출/매입/비용 항목별 집계\n• 전월 대비 증감 분석\n• 손익 추이 그래프 제공',
+                effect: '정확한 손익 현황 파악으로 경영 의사결정을 지원합니다.',
+                sample: '📊 제공 보고서: 월별 손익계산서, 비용 분석표'
+            },
+            projectPL: {
+                category: '손익 분석',
+                title: '프로젝트/현장별 손익분석',
+                icon: '🏗️',
+                method: '프로젝트, 현장, 품목별로 매출과 비용을 구분하여 개별 손익을 분석합니다.',
+                detail: '• 프로젝트/현장/품목 코드 설정\n• 매출-비용 개별 매칭 처리\n• 프로젝트별 수익률 분석',
+                effect: '수익성 높은 사업 영역을 파악하고 전략적 의사결정에 활용합니다.',
+                sample: '📊 제공 보고서: 프로젝트별 손익현황표, 현장별 원가분석표'
+            },
+            salesManagement: {
+                category: '손익 분석',
+                title: '품목별/프로젝트별 매출관리',
+                icon: '💰',
+                method: '품목이나 프로젝트 단위로 매출을 추적하고 관리합니다.',
+                detail: '• 품목별 매출 현황 집계\n• 거래처별 품목 매출 분석\n• 매출 추이 및 예측',
+                effect: '주력 상품/서비스를 파악하고 매출 전략 수립에 활용합니다.',
+                sample: '📊 제공 보고서: 품목별 매출현황표, 매출추이분석표'
+            },
+            // === 자금 관리 ===
+            arApManagement: {
+                category: '자금 관리',
+                title: '미수/미지급금 관리',
+                icon: '📋',
+                method: "경리나라를 활용하여 거래처별 미수금/미지급금 현황을 정확하게 파악합니다.",
+                detail: '• 거래처별 미수/미지급 잔액 관리\n• 연체 현황 및 회수율 분석\n• 채권 연령 분석 (Aging)',
+                effect: '채권/채무 현황을 정확히 파악하여 자금 계획에 활용합니다.',
+                sample: '📊 제공 보고서: 미수금 현황표, 미지급금 현황표, Aging 분석표'
+            },
+            cashFlowManagement: {
+                category: '자금 관리',
+                title: '자금현황 관리',
+                icon: '💵',
+                method: '일일/주간/월간 자금 현황을 모니터링하고 보고합니다.',
+                detail: '• 자금일보 작성 및 보고\n• 예상 입출금 스케줄 관리\n• 자금 부족 예측 알림',
+                effect: '자금 흐름을 예측하여 유동성 리스크를 사전에 방지합니다.',
+                sample: '📊 제공 보고서: 자금일보, 주간 자금계획표'
+            },
+            bankReconciliation: {
+                category: '자금 관리',
+                title: '입출금내역 대사',
+                icon: '🔄',
+                method: '은행 입출금 내역을 세금계산서, 카드매출 등 증빙과 매칭하여 관리합니다.',
+                detail: '• 입금 내역 ↔ 세금계산서 매칭\n• 출금 내역 ↔ 지출증빙 매칭\n• 미확인 거래 추적 및 확인',
+                effect: '모든 거래의 증빙을 확보하여 회계 투명성을 높입니다.',
+                sample: '📊 제공 보고서: 입출금 대사표, 미확인거래 목록'
+            },
+            // === 증빙/세무 지원 ===
+            documentManagement: {
+                category: '증빙/세무',
+                title: '증빙관리',
+                icon: '📁',
+                method: '세금계산서, 카드전표, 현금영수증 등 모든 증빙을 체계적으로 수집하고 관리합니다.',
+                detail: '• 전자세금계산서 자동 수집\n• 카드 매출전표 수집 및 정리\n• 간이영수증/현금영수증 관리',
+                effect: '증빙 누락 없이 완벽한 장부 관리가 가능합니다.',
+                sample: '📊 제공 자료: 월별 증빙 수집현황표'
+            },
+            taxSupport: {
+                category: '증빙/세무',
+                title: '세무신고 보조자료',
+                icon: '📝',
+                method: '부가세, 원천세 등 세무 신고에 필요한 기초 자료를 정리하여 제공합니다.',
+                detail: '• 부가세 신고용 매출/매입 집계\n• 원천세 신고용 급여 자료 정리\n• 세무사 전달용 자료 패키지',
+                effect: '세무대리인과의 원활한 협업으로 신고 오류를 방지합니다.',
+                sample: '📊 제공 자료: 부가세 신고자료, 원천세 신고자료'
+            },
+            // === 기타 서비스 ===
+            statementIssue: {
+                category: '기타',
+                title: '거래명세표 제작',
+                icon: '📃',
+                method: '거래처에 발송할 거래명세표를 작성하고 관리합니다.',
+                detail: '• 거래명세표 양식 설정\n• 품목별/거래처별 명세표 생성\n• 발송 이력 관리',
+                effect: '전문적인 거래명세표로 거래처와의 신뢰를 높입니다.',
+                sample: '📊 제공 자료: 거래명세표 템플릿'
+            },
+            payroll: {
+                category: '기타',
+                title: '급여 정산',
+                icon: '💼',
+                method: '확정된 근태 및 변동 내역을 바탕으로 급여 대장을 작성하고, 세무대리인에게 전달합니다.',
+                detail: '• 근태 데이터 기반 급여 계산\n• 4대보험료 계산\n• 급여명세서 생성',
+                effect: '정확한 급여 처리로 직원 만족도와 세무 정확성을 높입니다.',
+                sample: '📊 제공 보고서: 급여대장, 급여명세서'
+            },
+            customTool: {
+                category: '기타',
+                title: '맞춤 보조 도구 개발',
+                icon: '🛠️',
+                method: '귀사의 업무 특성에 맞는 맞춤형 엑셀/보고서 양식을 개발합니다.',
+                detail: '• 업무 프로세스 분석\n• 맞춤형 양식/도구 설계\n• 사용 교육 및 지원',
+                effect: '반복 업무를 자동화하여 업무 효율성을 극대화합니다.',
+                sample: '📊 제공 자료: 맞춤 개발 양식'
+            }
+        };
+
+        // 저장된 서비스 데이터 불러오기 또는 기본값 사용
+        let serviceData = JSON.parse(localStorage.getItem('serviceData')) || JSON.parse(JSON.stringify(defaultServiceData));
+
+        // 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            updateSelectionCount();
+            loadSavedData();
+        });
+
+        // 저장된 데이터 불러오기
+        function loadSavedData() {
+            let hasData = false;
+            
+            // 저장된 편집 내용 불러오기
+            const savedContent = localStorage.getItem('editedContent');
+            if (savedContent) {
+                try {
+                    const content = JSON.parse(savedContent);
+                    // 문서 내용 복원은 updatePreview 후에 적용
+                    window.savedEditContent = content;
+                    if (Object.keys(content).length > 0) hasData = true;
+                } catch (e) {
+                    console.error('저장된 내용 불러오기 실패:', e);
+                }
+            }
+
+            // 저장된 서비스 데이터 불러오기
+            const savedServiceData = localStorage.getItem('serviceData');
+            if (savedServiceData) {
+                try {
+                    serviceData = JSON.parse(savedServiceData);
+                    hasData = true;
+                } catch (e) {
+                    console.error('서비스 데이터 불러오기 실패:', e);
+                }
+            }
+            
+            // 저장된 데이터가 있으면 상태 표시
+            if (hasData) {
+                setTimeout(() => {
+                    updateSaveStatus('saved');
+                    showToast('이전에 저장된 내용이 불러와졌습니다', 'success');
+                }, 500);
+            }
+        }
+
+        // 편집 내용 저장
+        function saveEditedContent() {
+            const editables = document.querySelectorAll('#documentContent [data-key]');
+            const content = {};
+            
+            editables.forEach(el => {
+                const key = el.getAttribute('data-key');
+                if (key) {
+                    content[key] = el.innerHTML;
+                }
+            });
+            
+            localStorage.setItem('editedContent', JSON.stringify(content));
+        }
+
+        // 저장된 편집 내용 적용
+        function applySavedContent() {
+            if (window.savedEditContent) {
+                Object.keys(window.savedEditContent).forEach(key => {
+                    const el = document.querySelector(`[data-key="${key}"]`);
+                    if (el) {
+                        el.innerHTML = window.savedEditContent[key];
+                    }
+                });
+            }
+        }
+
+        // 서비스 데이터 저장
+        function saveServiceData() {
+            localStorage.setItem('serviceData', JSON.stringify(serviceData));
+        }
+
+        // 자동 저장 (디바운스)
+        function autoSave() {
+            clearTimeout(saveTimeout);
+            updateSaveStatus('saving');
+            
+            saveTimeout = setTimeout(() => {
+                saveAllContent();
+                updateSaveStatus('saved');
+            }, 1500);
+        }
+
+        // 수동 저장
+        function manualSave() {
+            updateSaveStatus('saving');
+            saveAllContent();
+            updateSaveStatus('saved');
+            showToast('내용이 저장되었습니다!', 'success');
+        }
+
+        // 저장 상태 업데이트
+        function updateSaveStatus(status) {
+            const statusEl = document.getElementById('saveStatus');
+            const textEl = document.getElementById('saveStatusText');
+            
+            statusEl.className = 'save-status ' + status;
+            
+            if (status === 'saving') {
+                textEl.textContent = '저장 중...';
+            } else if (status === 'saved') {
+                textEl.textContent = '저장 완료 (' + new Date().toLocaleTimeString('ko-KR', {hour: '2-digit', minute: '2-digit'}) + ')';
+            } else {
+                textEl.textContent = '수정 내용이 자동 저장됩니다';
+            }
+        }
+
+
+        // 서비스 토글 (새 구조)
+        function toggleService(checkbox, serviceId, type) {
+            const item = checkbox.closest('.checkbox-item');
+            const targetSet = type === 'recommended' ? recommendedServices : requestedServices;
+            
+            if (checkbox.checked) {
+                targetSet.add(serviceId);
+                item.classList.add('checked');
+            } else {
+                targetSet.delete(serviceId);
+                item.classList.remove('checked');
+            }
+            
+            updateSelectionCount();
+            updatePreview();
+        }
+
+        // 선택 카운트 업데이트
+        function updateSelectionCount() {
+            document.getElementById('requestedCount').innerHTML = 
+                `선택: <strong>${requestedServices.size}개</strong>`;
+            document.getElementById('recommendedCount').innerHTML = 
+                `선택: <strong>${recommendedServices.size}개</strong>`;
+        }
+
+        // 서비스 박스 HTML 생성
+        function generateServiceBoxHTML(serviceId, data, type) {
+            const typeLabel = type === 'recommended' ? '💡 경청 추천' : '📌 고객 요청';
+            const typeBadgeClass = type === 'recommended' ? 'badge-recommended' : 'badge-requested';
+            
+            return `
+                <div class="service-box ${type}" data-service-id="${serviceId}" style="page-break-inside: avoid; break-inside: avoid;">
+                    <div class="service-header">
+                        <span class="service-icon">${data.icon || '📋'}</span>
+                        <h4 data-editable data-key="svc_${serviceId}_title">${data.title}</h4>
+                        <span class="service-badge ${typeBadgeClass}">${typeLabel}</span>
+                    </div>
+                    <div class="service-body">
+                        <div class="info-row">
+                            <span class="info-label">운영 방식</span>
+                            <span class="info-value" data-editable data-key="svc_${serviceId}_method">${data.method}</span>
+                        </div>
+                        ${data.detail ? `
+                        <div class="info-row">
+                            <span class="info-label">상세 내용</span>
+                            <span class="info-value detail-text" data-editable data-key="svc_${serviceId}_detail">${data.detail.replace(/\n/g, '<br>')}</span>
+                        </div>
+                        ` : ''}
+                        <div class="info-row">
+                            <span class="info-label">기대 효과</span>
+                            <span class="info-value" data-editable data-key="svc_${serviceId}_effect">${data.effect}</span>
+                        </div>
+                        ${data.sample ? `
+                        <div class="sample-report">
+                            ${data.sample}
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        // 미리보기 업데이트
+        function updatePreview() {
+            const companyName = document.getElementById('companyName').value.trim();
+            const contactName = document.getElementById('contactName').value.trim();
+            const emptyState = document.getElementById('emptyState');
+            const documentContent = document.getElementById('documentContent');
+            
+            const totalServices = requestedServices.size + recommendedServices.size;
+            
+            if (totalServices === 0) {
+                emptyState.style.display = 'block';
+                documentContent.style.display = 'none';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            documentContent.style.display = 'block';
+            
+            // 고객명 업데이트
+            let displayName = companyName || '귀사';
+            if (contactName) {
+                displayName += ` (${contactName})`;
+            }
+            document.getElementById('docClientName').textContent = displayName;
+            
+            // 추가 옵션 처리
+            const existingStaffBox = document.getElementById('existingStaffBox');
+            if (existingStaffBox) {
+                const optExistingStaff = document.getElementById('optExistingStaff');
+                existingStaffBox.style.display = optExistingStaff && optExistingStaff.checked ? 'block' : 'none';
+            }
+            
+            const erpSection = document.getElementById('erpSection');
+            if (erpSection) {
+                const optErpPromo = document.getElementById('optErpPromo');
+                erpSection.style.display = optErpPromo && optErpPromo.checked ? 'block' : 'none';
+            }
+            
+            // 서비스 섹션 업데이트
+            const servicesSection = document.getElementById('selectedServicesSection');
+            const servicesContent = document.getElementById('selectedServicesContent');
+            
+            if (totalServices > 0 && servicesSection && servicesContent) {
+                servicesSection.style.display = 'block';
+                
+                let html = '';
+                
+                // 고객 요청 서비스
+                if (requestedServices.size > 0) {
+                    html += `<div class="service-group">
+                        <h3 class="service-group-title">📌 고객 요청 서비스 <span class="count">${requestedServices.size}개</span></h3>
+                        <p class="service-group-desc">고객사에서 필요하다고 요청하신 서비스입니다.</p>
+                        <div class="service-grid">`;
+                    
+                    requestedServices.forEach(serviceId => {
+                        const data = serviceData[serviceId];
+                        if (data) {
+                            html += generateServiceBoxHTML(serviceId, data, 'requested');
+                        }
+                    });
+                    html += `</div></div>`;
+                }
+                
+                // 경청 추천 서비스
+                if (recommendedServices.size > 0) {
+                    html += `<div class="service-group recommended-group-doc" style="page-break-before: always;">
+                        <h3 class="service-group-title" style="color: var(--ai-purple);">💡 경청 추천 서비스 <span class="count">${recommendedServices.size}개</span></h3>
+                        <p class="service-group-desc">경청에서 추가로 제안드리는 서비스입니다. 귀사의 업무 효율성 향상에 도움이 될 것으로 판단됩니다.</p>
+                        <div class="service-grid">`;
+                    
+                    recommendedServices.forEach(serviceId => {
+                        const data = serviceData[serviceId];
+                        if (data) {
+                            html += generateServiceBoxHTML(serviceId, data, 'recommended');
+                        }
+                    });
+                    html += `</div></div>`;
+                }
+                
+                servicesContent.innerHTML = html;
+            } else {
+                servicesSection.style.display = 'none';
+            }
+            
+            // 저장된 편집 내용 적용
+            applySavedContent();
+            
+            if (isEditMode) {
+                applyEditMode(true);
+            }
+        }
+
+        // 편집 모드
+        function toggleEditMode() {
+            isEditMode = !isEditMode;
+            const docEl = document.getElementById('document');
+            const editBtn = document.getElementById('editBtn');
+            
+            if (isEditMode) {
+                applyEditMode(true);
+                docEl.classList.add('edit-mode');
+                editBtn.innerHTML = `
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    편집 완료 & 저장
+                `;
+                editBtn.classList.remove('btn-primary');
+                editBtn.classList.add('btn-success');
+                showToast('편집 모드 - 텍스트를 클릭하여 수정하세요. 수정 내용은 자동 저장됩니다.');
+            } else {
+                // 편집 내용 저장
+                updateSaveStatus('saving');
+                saveAllContent();
+                updateSaveStatus('saved');
+                
+                applyEditMode(false);
+                docEl.classList.remove('edit-mode');
+                editBtn.innerHTML = `
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                    내용 편집 모드
+                `;
+                editBtn.classList.remove('btn-success');
+                editBtn.classList.add('btn-primary');
+                showToast('편집 내용이 저장되었습니다!', 'success');
+            }
+        }
+
+        function applyEditMode(enable) {
+            document.querySelectorAll('[data-editable]').forEach(el => {
+                if (enable) {
+                    el.setAttribute('contenteditable', 'true');
+                    el.addEventListener('input', handleEditInput);
+                } else {
+                    el.removeAttribute('contenteditable');
+                    el.removeEventListener('input', handleEditInput);
+                }
+            });
+        }
+
+        // 편집 입력 핸들러
+        function handleEditInput(e) {
+            const el = e.target;
+            const serviceField = el.getAttribute('data-service-field');
+            const serviceBox = el.closest('[data-service-id]');
+            
+            // 서비스 데이터 업데이트
+            if (serviceField && serviceBox) {
+                const serviceId = serviceBox.getAttribute('data-service-id');
+                if (serviceData[serviceId]) {
+                    serviceData[serviceId][serviceField] = el.innerHTML;
+                }
+            }
+            
+            // 자동 저장 트리거
+            autoSave();
+        }
+
+        // 모든 내용 저장
+        function saveAllContent() {
+            // 일반 편집 내용 저장
+            saveEditedContent();
+            
+            // 서비스 데이터 저장
+            saveServiceData();
+            
+            // savedEditContent 업데이트
+            const savedContent = localStorage.getItem('editedContent');
+            if (savedContent) {
+                window.savedEditContent = JSON.parse(savedContent);
+            }
+        }
+
+        // PDF 내보내기 버튼 클릭 시 인쇄 버튼 표시
+        function showPrintButton() {
+            const totalServices = requestedServices.size + recommendedServices.size;
+            if (totalServices === 0) {
+                showToast('서비스를 먼저 선택해주세요', 'error');
+                return;
+            }
+            
+            const wrapper = document.getElementById('printBtnWrapper');
+            if (wrapper.style.display === 'none') {
+                wrapper.style.display = 'block';
+                showToast('아래 "인쇄하기" 버튼을 클릭하세요', 'info');
+            } else {
+                wrapper.style.display = 'none';
+            }
+        }
+        
+        // PDF 내보내기 (브라우저 인쇄 기능 사용)
+        function exportToPDF() {
+            const totalServices = requestedServices.size + recommendedServices.size;
+            if (totalServices === 0) {
+                showToast('서비스를 먼저 선택해주세요', 'error');
+                return;
+            }
+            
+            if (isEditMode) toggleEditMode();
+            
+            // 인쇄 전 사이드바 숨기기
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            const document_el = document.getElementById('document');
+            
+            // 인쇄용 스타일 적용
+            sidebar.style.display = 'none';
+            mainContent.style.marginLeft = '0';
+            mainContent.style.width = '100%';
+            document_el.style.maxWidth = '100%';
+            document_el.style.margin = '0';
+            document_el.style.padding = '30px 50px';
+            document_el.style.boxShadow = 'none';
+            
+            // 파일명 안내
+            const companyName = document.getElementById('companyName').value.trim() || '귀사';
+            showToast(`인쇄 대화상자에서 "PDF로 저장"을 선택하세요.\n파일명: 경청_서비스소개서_${companyName}.pdf`, 'info');
+            
+            // 약간의 딜레이 후 인쇄
+            setTimeout(() => {
+                window.print();
+                
+                // 인쇄 후 원래 스타일 복원
+                setTimeout(() => {
+                    sidebar.style.display = '';
+                    mainContent.style.marginLeft = '';
+                    mainContent.style.width = '';
+                    document_el.style.maxWidth = '';
+                    document_el.style.margin = '';
+                    document_el.style.padding = '';
+                    document_el.style.boxShadow = '';
+                }, 500);
+            }, 300);
+        }
+        
+        // 인쇄하기 (프린터로 직접 인쇄)
+        function printDocument() {
+            const totalServices = requestedServices.size + recommendedServices.size;
+            if (totalServices === 0) {
+                showToast('서비스를 먼저 선택해주세요', 'error');
+                return;
+            }
+            
+            if (isEditMode) toggleEditMode();
+            
+            showToast('인쇄 대화상자가 열립니다. 배경 그래픽 옵션을 체크해주세요!', 'info');
+            
+            setTimeout(() => {
+                window.print();
+            }, 300);
+        }
+
+        // 초기화
+        function resetAll() {
+            if (confirm('모든 선택, 입력 및 저장된 편집 내용을 초기화하시겠습니까?')) {
+                // UI 초기화
+                document.querySelectorAll('.checkbox-item input[type="checkbox"]').forEach(cb => {
+                    cb.checked = false;
+                    cb.closest('.checkbox-item').classList.remove('checked', 'ai-recommended');
+                });
+                
+                const optErpPromo = document.getElementById('optErpPromo');
+                const optExistingStaff = document.getElementById('optExistingStaff');
+                if (optErpPromo) optErpPromo.checked = true;
+                if (optExistingStaff) optExistingStaff.checked = false;
+                
+                document.getElementById('companyName').value = '';
+                document.getElementById('contactName').value = '';
+                document.getElementById('industryType').value = '';
+                
+                // 저장된 편집 내용 삭제
+                localStorage.removeItem('editedContent');
+                localStorage.removeItem('serviceData');
+                window.savedEditContent = null;
+                
+                // 서비스 데이터 초기화
+                serviceData = JSON.parse(JSON.stringify(defaultServiceData));
+                
+                requestedServices.clear();
+                recommendedServices.clear();
+                
+                const aiResult = document.getElementById('aiResult');
+                if (aiResult) aiResult.classList.remove('show');
+                
+                updateSelectionCount();
+                updatePreview();
+                
+                // 저장 상태 초기화
+                const saveStatus = document.getElementById('saveStatus');
+                const saveStatusText = document.getElementById('saveStatusText');
+                if (saveStatus) saveStatus.className = 'save-status';
+                if (saveStatusText) saveStatusText.textContent = '수정 내용이 자동 저장됩니다';
+                
+                showToast('모든 내용이 초기화되었습니다');
+            }
+        }
+
+        // 토스트
+        function showToast(message, type = '') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            toast.className = 'toast' + (type ? ' ' + type : '');
+            toastMessage.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+    </script>
+</body>
+</html>
