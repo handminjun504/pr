@@ -1300,12 +1300,6 @@
             .cta-box {
                 page-break-inside: avoid !important;
             }
-            
-            /* 인건비/무료체험 문구 같은 페이지에 표시 */
-            .final-cta-group {
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
-            }
         }
 
         /* 페이지 브레이크 */
@@ -1321,7 +1315,6 @@
             page-break-inside: avoid; 
             break-inside: avoid;
         }
-        
 
         /* PDF용 서비스 그리드 - 2열 레이아웃 (A4 가로 최적화) */
         .service-grid {
@@ -1715,19 +1708,15 @@
                     내용 편집 모드
                 </button>
                 <div style="height: 10px;"></div>
-                <button class="btn btn-success btn-block" onclick="showPrintButton()" id="pdfBtn">
+                <button class="btn btn-success btn-block" onclick="exportToPDF()" id="pdfBtn">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                    📄 PDF 내보내기
+                    PDF 내보내기
                 </button>
-                <div id="printBtnWrapper" style="display: none; margin-top: 10px;">
-                    <button class="btn btn-block" style="background: #2563eb; color: white;" onclick="printDocument()" id="printBtn">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
-                        🖨️ 인쇄하기 (PDF로 저장)
-                    </button>
-                    <p style="font-size: 11px; color: #666; margin-top: 8px; text-align: center;">
-                        인쇄 대화상자에서<br>"PDF로 저장" 선택
-                    </p>
-                </div>
+                <div style="height: 10px;"></div>
+                <button class="btn btn-block" style="background: #4a5568; color: white;" onclick="printDocument()" id="printBtn">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                    🖨️ 인쇄하기
+                </button>
                     </div>
 
             <!-- 저장 상태 -->
@@ -1863,24 +1852,20 @@
                 </div>
             </div>
 
-                        <!-- 인건비/무료체험 문구 묶음 (같은 페이지에 표시) -->
-                        <div class="final-cta-group" style="page-break-inside: avoid; break-inside: avoid;">
-                            <div class="price-banner">
-                                <h3 data-editable data-key="doc_price_banner">💰 인건비보다 무조건 저렴합니다!</h3>
-                                <p data-editable data-key="doc_price_banner_desc">정규직 경리 채용 대비 합리적인 비용으로 전문 서비스를 이용하실 수 있습니다.</p>
-                            </div>
+                        <div class="price-banner">
+                            <h3 data-editable data-key="doc_price_banner">💰 인건비보다 무조건 저렴합니다!</h3>
+                            <p data-editable data-key="doc_price_banner_desc">정규직 경리 채용 대비 합리적인 비용으로 전문 서비스를 이용하실 수 있습니다.</p>
+            </div>
 
-                            <div class="cta-box">
+                        <div class="cta-box">
                             <h3 data-editable data-key="doc_cta_title">🎯 1달 무료 체험으로 직접 확인해보세요!</h3>
                             <p data-editable data-key="doc_cta_desc">
                     저희 서비스는 <strong>1달 무료 체험</strong>을 통해 업무 능력을 먼저 확인해보실 수 있습니다.<br>
                     귀사의 대표님과 충분히 소통하며 업무 방식을 맞춰가고,<br>
                     이후 계약 의사를 밝혀주시면 서비스 금액을 산정하여 월 정기 결제로 진행됩니다.<br><br>
                                 <strong>부담 없이 경험해보시고, 긍정적으로 검토 부탁드립니다!</strong>
-                                </p>
-                            </div>
-                        </div>
-                        <!-- /final-cta-group -->
+                </p>
+            </div>
 
                         <div class="doc-footer">
                             <div class="company" data-editable data-key="doc_company_name">주식회사 경리업무를잘하는청년들</div>
@@ -2408,23 +2393,6 @@
             }
         }
 
-        // PDF 내보내기 버튼 클릭 시 인쇄 버튼 표시
-        function showPrintButton() {
-            const totalServices = requestedServices.size + recommendedServices.size;
-            if (totalServices === 0) {
-                showToast('서비스를 먼저 선택해주세요', 'error');
-                return;
-            }
-            
-            const wrapper = document.getElementById('printBtnWrapper');
-            if (wrapper.style.display === 'none') {
-                wrapper.style.display = 'block';
-                showToast('아래 "인쇄하기" 버튼을 클릭하세요', 'info');
-            } else {
-                wrapper.style.display = 'none';
-            }
-        }
-        
         // PDF 내보내기 (브라우저 인쇄 기능 사용)
         function exportToPDF() {
             const totalServices = requestedServices.size + recommendedServices.size;
