@@ -107,7 +107,7 @@ body {
 
 /* 사이드바 - 입력 패널 */
 .sidebar {
-    width: 800px;
+    width: 700px;
     background: var(--white);
     border-right: 1px solid var(--border);
     padding: 24px;
@@ -575,7 +575,7 @@ body {
 
 /* 문서 컨테이너 */
 .document-wrapper {
-    max-width: 800px;
+    max-width: 900px;
     margin: 0 auto;
 }
 
@@ -583,7 +583,7 @@ body {
     background: var(--white);
     border-radius: 8px;
     box-shadow: var(--shadow-lg);
-    padding: 56px 64px;
+    padding: 48px 56px;
     min-height: 600px;
 }
 
