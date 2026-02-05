@@ -293,7 +293,7 @@ body {
 
 /* 추천 서비스 그룹 */
 .recommended-group {
-    max-height: 300px;
+    max-height: 400px;
     overflow-y: auto;
 }
 
@@ -381,9 +381,14 @@ body {
 
 /* 체크박스 그룹 */
 .checkbox-group {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
     gap: 8px;
+}
+
+/* 카테고리는 전체 너비 사용 */
+.checkbox-group .service-category {
+    grid-column: 1 / -1;
 }
 
 .checkbox-item {
@@ -454,6 +459,22 @@ body {
     font-size: 12px;
     color: var(--text-light);
     line-height: 1.5;
+}
+
+/* 비활성화된 체크박스 */
+.checkbox-item.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: var(--bg-dark);
+}
+
+.checkbox-item.disabled input[type="checkbox"] {
+    cursor: not-allowed;
+}
+
+.checkbox-item.disabled:hover {
+    background: var(--bg-dark);
+    border-color: var(--border-light);
 }
 
 /* 버튼 */
@@ -1374,6 +1395,11 @@ body {
     .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); max-height: 50vh; }
     .preview-area { padding: 20px; }
     .document { padding: 40px 32px; }
+    
+    /* 체크박스 그룹 1열로 변경 */
+    .checkbox-group {
+        grid-template-columns: 1fr;
+    }
 }
 
 @media (max-width: 600px) {

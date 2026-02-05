@@ -777,13 +777,32 @@
         function toggleService(checkbox, serviceId, type) {
             const item = checkbox.closest('.checkbox-item');
             const targetSet = type === 'recommended' ? recommendedServices : requestedServices;
+            const oppositeType = type === 'recommended' ? 'requested' : 'recommended';
             
             if (checkbox.checked) {
                 targetSet.add(serviceId);
                 item.classList.add('checked');
+                
+                // 반대편 체크박스 비활성화
+                const oppositeCheckbox = document.querySelector(
+                    `.checkbox-item[data-service="${serviceId}"][data-type="${oppositeType}"] input[type="checkbox"]`
+                );
+                if (oppositeCheckbox) {
+                    oppositeCheckbox.disabled = true;
+                    oppositeCheckbox.closest('.checkbox-item').classList.add('disabled');
+                }
             } else {
                 targetSet.delete(serviceId);
                 item.classList.remove('checked');
+                
+                // 반대편 체크박스 활성화
+                const oppositeCheckbox = document.querySelector(
+                    `.checkbox-item[data-service="${serviceId}"][data-type="${oppositeType}"] input[type="checkbox"]`
+                );
+                if (oppositeCheckbox) {
+                    oppositeCheckbox.disabled = false;
+                    oppositeCheckbox.closest('.checkbox-item').classList.remove('disabled');
+                }
             }
             
             updateSelectionCount();
@@ -1074,7 +1093,8 @@
                 // UI 초기화
                 document.querySelectorAll('.checkbox-item input[type="checkbox"]').forEach(cb => {
                     cb.checked = false;
-                    cb.closest('.checkbox-item').classList.remove('checked', 'ai-recommended');
+                    cb.disabled = false;
+                    cb.closest('.checkbox-item').classList.remove('checked', 'ai-recommended', 'disabled');
                 });
                 
                 const optErpPromo = document.getElementById('optErpPromo');
