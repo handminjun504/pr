@@ -12,8 +12,6 @@ dist/
 *.swp
 *.swo
 *~
-.DS_Store
-._*
 
 # 환경 변수 (.example 제외)
 .env
@@ -27,8 +25,20 @@ yarn-debug.log*
 yarn-error.log*
 
 # OS 파일
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+.AppleDouble
+.LSOverride
+# Windows
 Thumbs.db
+Thumbs.db:encryptable
 Desktop.ini
+ehthumbs.db
+ehthumbs_vista.db
 
 # 백업 파일
 *.bak
