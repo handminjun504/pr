@@ -867,7 +867,7 @@
                             </div>
                         </div>
                         <div class="service-box-image">
-                            <img src="${imagePath}" alt="${data.title}" onerror="this.style.display='none'">
+                            ${serviceImages[serviceId] ? `<img src="${imagePath}" alt="${data.title}">` : ''}
                         </div>
                     </div>
                 </div>
