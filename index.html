@@ -1073,16 +1073,23 @@
                     <style>
                         body {
                             margin: 0;
-                            padding: 20px;
+                            padding: 0;
                             background: #f5f7fa;
+                        }
+                        .preview-wrapper {
+                            padding: 60px 20px 20px 20px;
                         }
                         .preview-container {
                             max-width: 1200px;
                             margin: 0 auto;
                             background: white;
-                            padding: 40px;
                             box-shadow: 0 4px 16px rgba(0,0,0,0.1);
                             border-radius: 8px;
+                            overflow: hidden;
+                        }
+                        .document {
+                            padding: 56px 64px;
+                            background: white;
                         }
                         .preview-actions {
                             position: fixed;
@@ -1105,9 +1112,12 @@
                             align-items: center;
                             gap: 8px;
                             transition: all 0.2s;
+                            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
                         }
                         .preview-btn:hover {
                             background: #2d4a6f;
+                            transform: translateY(-1px);
+                            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
                         }
                         .preview-btn.close {
                             background: #6c757d;
@@ -1120,13 +1130,19 @@
                                 display: none !important;
                             }
                             body {
-                                padding: 0;
-                                background: white;
+                                padding: 0 !important;
+                                background: white !important;
+                            }
+                            .preview-wrapper {
+                                padding: 0 !important;
                             }
                             .preview-container {
-                                box-shadow: none;
-                                padding: 0;
-                                max-width: 100%;
+                                box-shadow: none !important;
+                                border-radius: 0 !important;
+                                max-width: 100% !important;
+                            }
+                            .document {
+                                padding: 0 !important;
                             }
                         }
                     </style>
@@ -1146,8 +1162,12 @@
                             닫기
                         </button>
                     </div>
-                    <div class="preview-container">
-                        ${documentContent.innerHTML}
+                    <div class="preview-wrapper">
+                        <div class="preview-container">
+                            <div class="document">
+                                ${documentContent.innerHTML}
+                            </div>
+                        </div>
                     </div>
                 </body>
                 </html>
