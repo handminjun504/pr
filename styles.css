@@ -1329,6 +1329,11 @@ body {
     .recommended-intro-content {
         max-width: 800px !important;
         margin: 0 auto !important;
+        padding: 60px !important;
+        background: white !important;
+        border: 3px solid var(--ai-purple) !important;
+        border-radius: 16px !important;
+        box-shadow: 0 8px 32px rgba(124, 58, 237, 0.15) !important;
     }
     
     .recommended-badge {
