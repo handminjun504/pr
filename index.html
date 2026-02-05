@@ -381,7 +381,8 @@
                 </div>
             </div>
 
-                        <div class="doc-section">
+                        <!-- 페이지 2: 서비스 소개 -->
+                        <div class="doc-section intro-section">
                             <h2 class="doc-section-title">
                                 <span class="icon">💡</span>
                                 <span>서비스 소개</span>
@@ -399,11 +400,8 @@
                             </div>
                         </div>
 
-                        <div class="doc-section page-break-before" id="selectedServicesSection" style="display: none;">
-                            <h2 class="doc-section-title">
-                                <span class="icon">⚡</span>
-                                <span>제공 서비스 상세</span>
-                            </h2>
+                        <!-- 페이지 3+: 제공 서비스 상세 (각 서비스 = 1페이지) -->
+                        <div class="doc-section" id="selectedServicesSection" style="display: none;">
                             <div id="selectedServicesContent"></div>
                         </div>
 
@@ -421,18 +419,8 @@
                 </div>
             </div>
 
-                        <div class="doc-section" id="erpSection" style="display: none;">
-                            <h2 class="doc-section-title">
-                    <span class="icon">🖥️</span>
-                                <span>ERP 시스템 안내</span>
-                </h2>
-                            <div class="highlight-box">
-                                <h4 data-editable data-key="doc_erp_title">🎁 경리나라 3개월 무료체험권 지급!</h4>
-                                <p data-editable data-key="doc_erp_desc">서비스 이용 시 전문 ERP 프로그램 <strong>'경리나라'</strong>를 활용하며, 계약 고객사에 <strong>3개월간 무료체험권</strong>을 지급해 드립니다.</p>
-                </div>
-            </div>
-
-                        <div class="doc-section">
+                        <!-- 마지막에서 두 번째 페이지: 비용 산정 -->
+                        <div class="doc-section cost-section">
                             <h2 class="doc-section-title">
                     <span class="icon">📝</span>
                                 <span>비용 산정 및 계약 절차</span>
@@ -468,28 +456,38 @@
                 </div>
             </div>
 
-                        <div class="price-banner">
-                            <h3 data-editable data-key="doc_price_banner">💰 인건비보다 무조건 저렴합니다!</h3>
-                            <p data-editable data-key="doc_price_banner_desc">정규직 경리 채용 대비 합리적인 비용으로 전문 서비스를 이용하실 수 있습니다.</p>
-            </div>
+                        <!-- 마지막 페이지: 인건비 + 무료 체험 -->
+                        <div class="final-page">
+                            <div class="price-banner">
+                                <h3 data-editable data-key="doc_price_banner">💰 인건비보다 무조건 저렴합니다!</h3>
+                                <p data-editable data-key="doc_price_banner_desc">정규직 경리 채용 대비 합리적인 비용으로 전문 서비스를 이용하실 수 있습니다.</p>
+                            </div>
 
-                        <div class="cta-box">
-                            <h3 data-editable data-key="doc_cta_title">🎯 1달 무료 체험으로 직접 확인해보세요!</h3>
-                            <p data-editable data-key="doc_cta_desc">
-                    저희 서비스는 <strong>1달 무료 체험</strong>을 통해 업무 능력을 먼저 확인해보실 수 있습니다.<br>
-                    귀사의 대표님과 충분히 소통하며 업무 방식을 맞춰가고,<br>
-                    이후 계약 의사를 밝혀주시면 서비스 금액을 산정하여 월 정기 결제로 진행됩니다.<br><br>
-                                <strong>부담 없이 경험해보시고, 긍정적으로 검토 부탁드립니다!</strong>
-                </p>
-            </div>
+                            <div id="erpSection" style="display: none;" class="erp-final-section">
+                                <div class="highlight-box">
+                                    <h4 data-editable data-key="doc_erp_title">🎁 경리나라 3개월 무료체험권 지급!</h4>
+                                    <p data-editable data-key="doc_erp_desc">서비스 이용 시 전문 ERP 프로그램 <strong>'경리나라'</strong>를 활용하며, 계약 고객사에 <strong>3개월간 무료체험권</strong>을 지급해 드립니다.</p>
+                                </div>
+                            </div>
 
-                        <div class="doc-footer">
-                            <div class="company" data-editable data-key="doc_company_name">주식회사 경리업무를잘하는청년들</div>
-                <div class="info">
-                                <span class="ceo" data-editable data-key="doc_ceo">대표 금종석</span><br>
-                                <span data-editable data-key="doc_company_desc">원격 경리업무 전문 서비스 기업</span>
-                </div>
-            </div>
+                            <div class="cta-box">
+                                <h3 data-editable data-key="doc_cta_title">🎯 1달 무료 체험으로 직접 확인해보세요!</h3>
+                                <p data-editable data-key="doc_cta_desc">
+                        저희 서비스는 <strong>1달 무료 체험</strong>을 통해 업무 능력을 먼저 확인해보실 수 있습니다.<br>
+                        귀사의 대표님과 충분히 소통하며 업무 방식을 맞춰가고,<br>
+                        이후 계약 의사를 밝혀주시면 서비스 금액을 산정하여 월 정기 결제로 진행됩니다.<br><br>
+                                    <strong>부담 없이 경험해보시고, 긍정적으로 검토 부탁드립니다!</strong>
+                    </p>
+                            </div>
+
+                            <div class="doc-footer">
+                                <div class="company" data-editable data-key="doc_company_name">주식회사 경리업무를잘하는청년들</div>
+                                <div class="info">
+                                    <span class="ceo" data-editable data-key="doc_ceo">대표 금종석</span><br>
+                                    <span data-editable data-key="doc_company_desc">원격 경리업무 전문 서비스 기업</span>
+                                </div>
+                            </div>
+                        </div>
         </div>
                 </div>
             </div>

@@ -1243,20 +1243,45 @@ body {
         outline: none !important; 
     }
     
+    /* 페이지 1: 표지 (헤더만) */
+    .doc-header {
+        page-break-after: always !important;
+        break-after: always !important;
+        min-height: 90vh !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        padding: 60px !important;
+    }
+    
+    /* 페이지 2: 서비스 소개 (업무 소통 정책 제외하고 한 페이지에) */
+    .intro-section {
+        page-break-after: avoid !important;
+        break-after: avoid !important;
+    }
+    
+    /* 업무 소통 정책은 숨김 */
+    .policy-section {
+        display: none !important;
+    }
+    
+    /* ERP 섹션 숨김 (마지막 페이지에 포함) */
+    .erp-section-print-hide {
+        display: none !important;
+    }
+    
+    /* 페이지 3+: 서비스 상세 (각 서비스 = 1페이지) */
+    .service-group {
+        page-break-before: always !important;
+        break-before: always !important;
+    }
+    
     /* 서비스 박스 인쇄 최적화 */
     .service-box {
         page-break-inside: avoid !important;
         break-inside: avoid !important;
         margin-bottom: 15px !important;
         border: 1px solid #ddd !important;
-    }
-    
-    .service-group {
-        page-break-before: auto;
-    }
-    
-    .service-group:not(:first-child) {
-        page-break-before: always;
     }
     
     /* 모든 배경색 인쇄 시 유지 */
@@ -1322,8 +1347,48 @@ body {
         page-break-inside: avoid !important;
     }
     
+    /* 마지막에서 두 번째 페이지: 비용 산정 */
+    .cost-section {
+        page-break-before: always !important;
+        break-before: always !important;
+        page-break-after: always !important;
+        break-after: always !important;
+        min-height: 90vh !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        padding: 60px !important;
+    }
+    
+    /* 마지막 페이지: 가격 배너 + CTA */
+    .final-page {
+        page-break-before: always !important;
+        break-before: always !important;
+        min-height: 90vh !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        padding: 60px !important;
+    }
+    
+    .price-banner {
+        margin-bottom: 40px !important;
+        font-size: 120% !important;
+    }
+    
+    .erp-final-section {
+        display: block !important;
+        margin: 30px 0 !important;
+    }
+    
     .cta-box {
         page-break-inside: avoid !important;
+        margin-bottom: 40px !important;
+    }
+    
+    .doc-footer {
+        page-break-before: avoid !important;
+        margin-top: auto !important;
     }
 }
 
