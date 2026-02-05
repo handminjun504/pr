@@ -825,33 +825,48 @@
             const typeLabel = type === 'recommended' ? '💡 경청 추천' : '📌 고객 요청';
             const typeBadgeClass = type === 'recommended' ? 'badge-recommended' : 'badge-requested';
             
+            // 서비스별 이미지 매핑 (있는 경우만)
+            const serviceImages = {
+                'accountManagement': 'images/accountManagement.png',
+                // 추가 이미지가 있으면 여기에 추가
+            };
+            
+            const imagePath = serviceImages[serviceId] || 'images/default-service.png';
+            
             return `
                 <div class="service-box ${type}" data-service-id="${serviceId}" style="page-break-inside: avoid; break-inside: avoid;">
-                    <div class="service-header">
-                        <span class="service-icon">${data.icon || '📋'}</span>
-                        <h4 data-editable data-key="svc_${serviceId}_title">${data.title}</h4>
-                        <span class="service-badge ${typeBadgeClass}">${typeLabel}</span>
-                    </div>
-                    <div class="service-body">
-                        <div class="info-row">
-                            <span class="info-label">운영 방식</span>
-                            <span class="info-value" data-editable data-key="svc_${serviceId}_method">${data.method}</span>
+                    <div class="service-box-inner">
+                        <div class="service-box-content">
+                            <div class="service-header">
+                                <span class="service-icon">${data.icon || '📋'}</span>
+                                <h4 data-editable data-key="svc_${serviceId}_title">${data.title}</h4>
+                                <span class="service-badge ${typeBadgeClass}">${typeLabel}</span>
+                            </div>
+                            <div class="service-body">
+                                <div class="info-row">
+                                    <span class="info-label">운영 방식</span>
+                                    <span class="info-value" data-editable data-key="svc_${serviceId}_method">${data.method}</span>
+                                </div>
+                                ${data.detail ? `
+                                <div class="info-row">
+                                    <span class="info-label">상세 내용</span>
+                                    <span class="info-value detail-text" data-editable data-key="svc_${serviceId}_detail">${data.detail.replace(/\n/g, '<br>')}</span>
+                                </div>
+                                ` : ''}
+                                <div class="info-row">
+                                    <span class="info-label">기대 효과</span>
+                                    <span class="info-value" data-editable data-key="svc_${serviceId}_effect">${data.effect}</span>
+                                </div>
+                                ${data.sample ? `
+                                <div class="sample-report">
+                                    ${data.sample}
+                                </div>
+                                ` : ''}
+                            </div>
                         </div>
-                        ${data.detail ? `
-                        <div class="info-row">
-                            <span class="info-label">상세 내용</span>
-                            <span class="info-value detail-text" data-editable data-key="svc_${serviceId}_detail">${data.detail.replace(/\n/g, '<br>')}</span>
+                        <div class="service-box-image">
+                            <img src="${imagePath}" alt="${data.title}" onerror="this.style.display='none'">
                         </div>
-                        ` : ''}
-                        <div class="info-row">
-                            <span class="info-label">기대 효과</span>
-                            <span class="info-value" data-editable data-key="svc_${serviceId}_effect">${data.effect}</span>
-                        </div>
-                        ${data.sample ? `
-                        <div class="sample-report">
-                            ${data.sample}
-                        </div>
-                        ` : ''}
                     </div>
                 </div>
             `;

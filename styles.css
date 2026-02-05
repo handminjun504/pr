@@ -1341,64 +1341,129 @@ body {
     break-inside: avoid;
 }
 
-/* PDF용 서비스 그리드 - 2열 레이아웃 (A4 가로 최적화) */
+/* PDF용 서비스 그리드 - 2열 레이아웃 (화면용) */
 .service-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 20px;
 }
 
-.service-grid .service-box {
-    margin-bottom: 0;
-    padding: 16px 20px;
-    page-break-inside: avoid;
-    break-inside: avoid;
-    box-sizing: border-box;
+/* 서비스 박스 내부 레이아웃 */
+.service-box-inner {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
 }
 
-.service-grid .service-header {
-    margin-bottom: 12px;
-    padding-bottom: 10px;
+.service-box-content {
+    flex: 1;
 }
 
-.service-grid .service-header h4 {
-    font-size: 15px;
+.service-box-image {
+    width: 300px;
+    flex-shrink: 0;
+    display: none; /* 화면에서는 숨김 */
 }
 
-.service-grid .service-icon {
-    font-size: 20px;
+.service-box-image img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-.service-grid .info-row {
-    padding: 6px 0;
-}
-
-.service-grid .info-label {
-    font-size: 11px;
-    min-width: 70px;
-}
-
-.service-grid .info-value {
-    font-size: 12px;
-    line-height: 1.5;
-}
-
-.service-grid .detail-text {
-    font-size: 12px;
-    line-height: 1.6;
-}
-
-.service-grid .sample-report {
-    font-size: 11px;
-    padding: 8px 12px;
-    margin-top: 10px;
-}
-
+/* 인쇄 시 스타일 */
 @media print {
+    /* 서비스 그리드 1열로 변경 */
     .service-grid {
-        display: grid !important;
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: 16px !important;
+        display: block !important;
+    }
+    
+    /* 각 서비스 박스를 한 페이지에 하나씩 */
+    .service-grid .service-box {
+        page-break-before: always !important;
+        page-break-after: always !important;
+        break-before: always !important;
+        break-after: always !important;
+        margin-bottom: 0 !important;
+        padding: 40px !important;
+        min-height: 90vh !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+    }
+    
+    /* 첫 번째 서비스는 페이지 브레이크 제거 */
+    .service-grid .service-box:first-child {
+        page-break-before: auto !important;
+        break-before: auto !important;
+    }
+    
+    /* 서비스 박스 내부를 좌우 배치 */
+    .service-box-inner {
+        display: flex !important;
+        gap: 40px !important;
+        align-items: center !important;
+    }
+    
+    .service-box-content {
+        flex: 1 !important;
+    }
+    
+    /* 이미지 표시 */
+    .service-box-image {
+        display: block !important;
+        width: 350px !important;
+        flex-shrink: 0 !important;
+    }
+    
+    .service-box-image img {
+        width: 100% !important;
+        height: auto !important;
+        border-radius: 12px !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2) !important;
+    }
+    
+    /* 서비스 헤더 크게 */
+    .service-grid .service-header {
+        margin-bottom: 20px !important;
+        padding-bottom: 15px !important;
+    }
+    
+    .service-grid .service-header h4 {
+        font-size: 24px !important;
+    }
+    
+    .service-grid .service-icon {
+        font-size: 32px !important;
+    }
+    
+    /* 내용 크게 */
+    .service-grid .info-row {
+        padding: 10px 0 !important;
+        margin-bottom: 8px !important;
+    }
+    
+    .service-grid .info-label {
+        font-size: 14px !important;
+        min-width: 100px !important;
+        font-weight: 700 !important;
+    }
+    
+    .service-grid .info-value {
+        font-size: 14px !important;
+        line-height: 1.8 !important;
+    }
+    
+    .service-grid .detail-text {
+        font-size: 14px !important;
+        line-height: 1.8 !important;
+    }
+    
+    .service-grid .sample-report {
+        font-size: 13px !important;
+        padding: 12px 16px !important;
+        margin-top: 15px !important;
     }
 }
 
