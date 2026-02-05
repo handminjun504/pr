@@ -965,20 +965,24 @@
                 let html = '';
                 
                 // 고객 요청 서비스 상세
-                requestedServices.forEach(serviceId => {
-                    const data = serviceData[serviceId];
-                    if (data) {
-                        html += generateServiceBoxHTML(serviceId, data, 'requested');
-                    }
-                });
+                if (requestedServices.size > 0) {
+                    requestedServices.forEach(serviceId => {
+                        const data = serviceData[serviceId];
+                        if (data) {
+                            html += generateServiceBoxHTML(serviceId, data, 'requested');
+                        }
+                    });
+                }
                 
-                // 경청 추천 서비스 상세
-                recommendedServices.forEach(serviceId => {
-                    const data = serviceData[serviceId];
-                    if (data) {
-                        html += generateServiceBoxHTML(serviceId, data, 'recommended');
-                    }
-                });
+                // 경청 추천 서비스 상세 (고객 요청 서비스 다음에)
+                if (recommendedServices.size > 0) {
+                    recommendedServices.forEach(serviceId => {
+                        const data = serviceData[serviceId];
+                        if (data) {
+                            html += generateServiceBoxHTML(serviceId, data, 'recommended');
+                        }
+                    });
+                }
                 
                 servicesContent.innerHTML = html;
             } else {
