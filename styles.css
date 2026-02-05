@@ -1254,10 +1254,29 @@ body {
         padding: 60px !important;
     }
     
-    /* 페이지 2: 서비스 소개 (업무 소통 정책 제외하고 한 페이지에) */
+    /* 페이지 2: 서비스 소개 + 서비스 목록 */
     .intro-section {
-        page-break-after: avoid !important;
-        break-after: avoid !important;
+        page-break-after: always !important;
+        break-after: always !important;
+        min-height: 90vh !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        padding: 60px !important;
+    }
+    
+    .services-simple-list {
+        margin-top: 20px;
+    }
+    
+    .service-list-group ul {
+        columns: 2;
+        column-gap: 30px;
+    }
+    
+    .service-list-group ul li {
+        break-inside: avoid;
+        page-break-inside: avoid;
     }
     
     /* 업무 소통 정책은 숨김 */
@@ -1271,17 +1290,25 @@ body {
     }
     
     /* 페이지 3+: 서비스 상세 (각 서비스 = 1페이지) */
-    .service-group {
+    #selectedServicesContent .service-box {
         page-break-before: always !important;
         break-before: always !important;
-    }
-    
-    /* 서비스 박스 인쇄 최적화 */
-    .service-box {
+        page-break-after: always !important;
+        break-after: always !important;
         page-break-inside: avoid !important;
         break-inside: avoid !important;
-        margin-bottom: 15px !important;
-        border: 1px solid #ddd !important;
+        margin-bottom: 0 !important;
+        border: none !important;
+        min-height: 90vh !important;
+        display: flex !important;
+        align-items: center !important;
+        padding: 60px 40px !important;
+    }
+    
+    /* 첫 번째 서비스는 페이지 브레이크 유지 */
+    #selectedServicesContent .service-box:first-child {
+        page-break-before: always !important;
+        break-before: always !important;
     }
     
     /* 모든 배경색 인쇄 시 유지 */

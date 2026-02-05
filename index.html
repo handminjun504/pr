@@ -376,12 +376,12 @@
                 </div>
             </div>
 
-                        <!-- 페이지 2: 서비스 소개 -->
+                        <!-- 페이지 2: 서비스 소개 + 요청 서비스 목록 -->
                         <div class="doc-section intro-section">
                             <h2 class="doc-section-title">
                                 <span class="icon">💡</span>
                                 <span>서비스 소개</span>
-                </h2>
+                            </h2>
                             <div class="doc-content">
                                 <p data-editable data-key="doc_intro">
                                     <strong>주식회사 경리업무를잘하는청년들</strong>은 원격으로 경리업무를 대행해드리는 전문 서비스 기업입니다.
@@ -392,6 +392,15 @@
                                     <h4>🎯 기존 경리 직원이 있어도 이용 가능합니다!</h4>
                                     <p data-editable data-key="doc_existing_staff">퇴사 리스크 최소화, 업무 백업 체계 구축, 전문 업무 분담 등 다양한 형태로 활용하실 수 있습니다.</p>
                                 </div>
+                            </div>
+                            
+                            <!-- 선택된 서비스 목록 (2페이지) -->
+                            <div id="selectedServicesList" style="display: none; margin-top: 40px;">
+                                <h2 class="doc-section-title">
+                                    <span class="icon">📋</span>
+                                    <span>선택하신 서비스</span>
+                                </h2>
+                                <div id="servicesListContent"></div>
                             </div>
                         </div>
 
@@ -903,7 +912,50 @@
                 erpSection.style.display = optErpPromo && optErpPromo.checked ? 'block' : 'none';
             }
             
-            // 서비스 섹션 업데이트
+            // 2페이지: 서비스 목록 (간단하게)
+            const servicesList = document.getElementById('selectedServicesList');
+            const servicesListContent = document.getElementById('servicesListContent');
+            
+            if (totalServices > 0 && servicesList && servicesListContent) {
+                servicesList.style.display = 'block';
+                
+                let listHtml = '<div class="services-simple-list">';
+                
+                // 고객 요청 서비스 목록
+                if (requestedServices.size > 0) {
+                    listHtml += `<div class="service-list-group">
+                        <h3 style="color: var(--navy); font-size: 16px; margin-bottom: 12px;">📌 고객 요청 서비스 (${requestedServices.size}개)</h3>
+                        <ul class="styled-list">`;
+                    requestedServices.forEach(serviceId => {
+                        const data = serviceData[serviceId];
+                        if (data) {
+                            listHtml += `<li><strong>${data.icon} ${data.title}</strong></li>`;
+                        }
+                    });
+                    listHtml += `</ul></div>`;
+                }
+                
+                // 경청 추천 서비스 목록
+                if (recommendedServices.size > 0) {
+                    listHtml += `<div class="service-list-group" style="margin-top: 24px;">
+                        <h3 style="color: var(--ai-purple); font-size: 16px; margin-bottom: 12px;">💡 경청 추천 서비스 (${recommendedServices.size}개)</h3>
+                        <ul class="styled-list">`;
+                    recommendedServices.forEach(serviceId => {
+                        const data = serviceData[serviceId];
+                        if (data) {
+                            listHtml += `<li><strong>${data.icon} ${data.title}</strong></li>`;
+                        }
+                    });
+                    listHtml += `</ul></div>`;
+                }
+                
+                listHtml += '</div>';
+                servicesListContent.innerHTML = listHtml;
+            } else {
+                servicesList.style.display = 'none';
+            }
+            
+            // 3페이지+: 서비스 상세 (각 서비스 = 1페이지)
             const servicesSection = document.getElementById('selectedServicesSection');
             const servicesContent = document.getElementById('selectedServicesContent');
             
@@ -912,37 +964,21 @@
                 
                 let html = '';
                 
-                // 고객 요청 서비스
-                if (requestedServices.size > 0) {
-                    html += `<div class="service-group">
-                        <h3 class="service-group-title">📌 고객 요청 서비스 <span class="count">${requestedServices.size}개</span></h3>
-                        <p class="service-group-desc">고객사에서 필요하다고 요청하신 서비스입니다.</p>
-                        <div class="service-grid">`;
-                    
-                    requestedServices.forEach(serviceId => {
-                        const data = serviceData[serviceId];
-                        if (data) {
-                            html += generateServiceBoxHTML(serviceId, data, 'requested');
-                        }
-                    });
-                    html += `</div></div>`;
-                }
+                // 고객 요청 서비스 상세
+                requestedServices.forEach(serviceId => {
+                    const data = serviceData[serviceId];
+                    if (data) {
+                        html += generateServiceBoxHTML(serviceId, data, 'requested');
+                    }
+                });
                 
-                // 경청 추천 서비스
-                if (recommendedServices.size > 0) {
-                    html += `<div class="service-group recommended-group-doc" style="page-break-before: always;">
-                        <h3 class="service-group-title" style="color: var(--ai-purple);">💡 경청 추천 서비스 <span class="count">${recommendedServices.size}개</span></h3>
-                        <p class="service-group-desc">경청에서 추가로 제안드리는 서비스입니다. 귀사의 업무 효율성 향상에 도움이 될 것으로 판단됩니다.</p>
-                        <div class="service-grid">`;
-                    
-                    recommendedServices.forEach(serviceId => {
-                        const data = serviceData[serviceId];
-                        if (data) {
-                            html += generateServiceBoxHTML(serviceId, data, 'recommended');
-                        }
-                    });
-                    html += `</div></div>`;
-                }
+                // 경청 추천 서비스 상세
+                recommendedServices.forEach(serviceId => {
+                    const data = serviceData[serviceId];
+                    if (data) {
+                        html += generateServiceBoxHTML(serviceId, data, 'recommended');
+                    }
+                });
                 
                 servicesContent.innerHTML = html;
             } else {
