@@ -672,7 +672,11 @@
 
         document.addEventListener('gc:serviceData', (e) => {
             if (e.detail && typeof e.detail === 'object') {
-                serviceData = { ...defaultServiceData, ...e.detail };
+                const merged = { ...defaultServiceData };
+                for (const k of Object.keys(e.detail)) {
+                    merged[k] = { ...(defaultServiceData[k] || {}), ...e.detail[k] };
+                }
+                serviceData = merged;
                 saveServiceData();
                 updateSelectionCount();
                 updatePreview();
@@ -846,19 +850,45 @@
                 `선택: <strong>${recommendedServices.size}개</strong>`;
         }
 
+        // 서비스 상세 이미지: data.image_url(PocketBase/JSON) 우선, 없으면 ./images/{serviceId}.png → jpg → webp
+        function onServiceImageError(img) {
+            const sid = img.getAttribute('data-sid');
+            if (!sid) {
+                img.remove();
+                return;
+            }
+            const step = img.dataset.fallback || '0';
+            if (step === '0') {
+                img.dataset.fallback = '1';
+                img.src = `./images/${sid}.jpg`;
+                return;
+            }
+            if (step === '1') {
+                img.dataset.fallback = '2';
+                img.src = `./images/${sid}.webp`;
+                return;
+            }
+            img.remove();
+        }
+
+        function resolveServiceImageSrc(serviceId, data) {
+            const u = data && data.image_url;
+            if (typeof u === 'string' && u.trim()) return u.trim();
+            return `./images/${serviceId}.png`;
+        }
+
+        function isRemoteImageSrc(src) {
+            return /^https?:\/\//i.test(src || '');
+        }
+
         // 서비스 박스 HTML 생성
         function generateServiceBoxHTML(serviceId, data, type) {
             const typeLabel = type === 'recommended' ? '💡 경청 추천' : '📌 고객 요청';
             const typeBadgeClass = type === 'recommended' ? 'badge-recommended' : 'badge-requested';
-            
-            // 서비스별 이미지 매핑 (있는 경우만)
-            const serviceImages = {
-                'accountManagement': 'images/accountManagement.png',
-                // 추가 이미지가 있으면 여기에 추가
-            };
-            
-            const imagePath = serviceImages[serviceId] || 'images/default-service.png';
-            
+            const imgSrc = resolveServiceImageSrc(serviceId, data);
+            const altSafe = (data.title || '').replace(/"/g, '&quot;');
+            const imgOnError = isRemoteImageSrc(imgSrc) ? 'this.remove()' : 'onServiceImageError(this)';
+
             return `
                 <div class="service-box ${type}" data-service-id="${serviceId}" style="page-break-inside: avoid; break-inside: avoid;">
                     <div class="service-box-inner">
@@ -891,7 +921,7 @@
                             </div>
                         </div>
                         <div class="service-box-image">
-                            ${serviceImages[serviceId] ? `<img src="${imagePath}" alt="${data.title}">` : ''}
+                            <img src="${imgSrc}" alt="${altSafe}" loading="lazy" data-sid="${serviceId}" onerror="${imgOnError}">
                         </div>
                     </div>
                 </div>
