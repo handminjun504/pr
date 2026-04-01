@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "gl-server": {
+      "url": "http://192.168.0.53:4000/mcp",
+      "headers": {
+        "Authorization": "Bearer YOUR_GL_API_TOKEN"
+      }
+    }
+  }
+}

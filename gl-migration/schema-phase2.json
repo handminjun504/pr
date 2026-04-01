@@ -1,0 +1,68 @@
+[
+  {
+    "name": "gc_proposals",
+    "type": "base",
+    "fields": [
+      {
+        "name": "client",
+        "type": "relation",
+        "required": true,
+        "options": {
+          "collectionId": "__REPLACE_GC_PROPOSAL_CLIENTS_COLLECTION_ID__",
+          "maxSelect": 1,
+          "cascadeDelete": false
+        }
+      },
+      { "name": "title", "type": "text", "required": true },
+      { "name": "status", "type": "text", "required": true },
+      { "name": "include_existing_staff", "type": "bool", "required": false },
+      { "name": "include_erp_promo", "type": "bool", "required": false },
+      { "name": "custom_content", "type": "json", "required": false },
+      { "name": "pdf_url", "type": "url", "required": false },
+      { "name": "sent_at", "type": "date", "required": false },
+      { "name": "legacy_supabase_id", "type": "number", "required": false }
+    ],
+    "listRule": "",
+    "viewRule": "",
+    "createRule": "",
+    "updateRule": "",
+    "deleteRule": ""
+  },
+  {
+    "name": "gc_proposal_service_selections",
+    "type": "base",
+    "fields": [
+      {
+        "name": "proposal",
+        "type": "relation",
+        "required": true,
+        "options": {
+          "collectionId": "__REPLACE_GC_PROPOSALS_COLLECTION_ID__",
+          "maxSelect": 1,
+          "cascadeDelete": true
+        }
+      },
+      {
+        "name": "service",
+        "type": "relation",
+        "required": true,
+        "options": {
+          "collectionId": "__REPLACE_GC_PROPOSAL_SERVICES_COLLECTION_ID__",
+          "maxSelect": 1,
+          "cascadeDelete": false
+        }
+      },
+      { "name": "selection_type", "type": "text", "required": true },
+      { "name": "custom_title", "type": "text", "required": false },
+      { "name": "custom_method", "type": "text", "required": false },
+      { "name": "custom_detail", "type": "editor", "required": false },
+      { "name": "custom_effect", "type": "text", "required": false },
+      { "name": "legacy_supabase_id", "type": "number", "required": false }
+    ],
+    "listRule": "",
+    "viewRule": "",
+    "createRule": "",
+    "updateRule": "",
+    "deleteRule": ""
+  }
+]

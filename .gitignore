@@ -9,6 +9,9 @@ dist/
 # 에디터
 .vscode/
 .idea/
+# 로컬 MCP 설정(토큰 포함 가능)
+.cursor/mcp.json
+
 *.swp
 *.swo
 *~
@@ -17,6 +20,7 @@ dist/
 .env
 .env.local
 .env.production
+.env.migrate
 
 # 로그
 *.log

@@ -505,11 +505,13 @@
     </div>
 
     <script>
-        // 상태
-        let requestedServices = new Set();  // 고객 요청 서비스
-        let recommendedServices = new Set(); // 경청 추천 서비스
+        // 상태 (var: gl-bridge 모듈에서 window.requestedServices 등으로 접근)
+        var requestedServices = new Set();  // 고객 요청 서비스
+        var recommendedServices = new Set(); // 경청 추천 서비스
         let isEditMode = false;
         let saveTimeout = null;
+        var gcCurrentProposalId = null;
+        var gcCurrentClientId = null;
 
         // 기본 서비스 데이터 (모듈화)
         const defaultServiceData = {
@@ -666,7 +668,16 @@
         };
 
         // 저장된 서비스 데이터 불러오기 또는 기본값 사용
-        let serviceData = JSON.parse(localStorage.getItem('serviceData')) || JSON.parse(JSON.stringify(defaultServiceData));
+        var serviceData = JSON.parse(localStorage.getItem('serviceData')) || JSON.parse(JSON.stringify(defaultServiceData));
+
+        document.addEventListener('gc:serviceData', (e) => {
+            if (e.detail && typeof e.detail === 'object') {
+                serviceData = { ...defaultServiceData, ...e.detail };
+                saveServiceData();
+                updateSelectionCount();
+                updatePreview();
+            }
+        });
 
         // 초기화
         document.addEventListener('DOMContentLoaded', function() {
@@ -754,9 +765,21 @@
             }, 1500);
         }
 
-        // 수동 저장
-        function manualSave() {
+        // 수동 저장 (VITE_POCKETBASE_URL 설정 시 GL PocketBase로도 저장)
+        async function manualSave() {
             updateSaveStatus('saving');
+            if (typeof window.glManualSave === 'function') {
+                try {
+                    await window.glManualSave();
+                    updateSaveStatus('saved');
+                    showToast('저장되었습니다 (GL)', 'success');
+                    return;
+                } catch (err) {
+                    showToast('GL 저장 실패: ' + (err.message || err), 'error');
+                    updateSaveStatus('saved');
+                    return;
+                }
+            }
             saveAllContent();
             updateSaveStatus('saved');
             showToast('내용이 저장되었습니다!', 'success');
@@ -1136,6 +1159,8 @@
                 
                 requestedServices.clear();
                 recommendedServices.clear();
+                gcCurrentProposalId = null;
+                gcCurrentClientId = null;
                 
                 const aiResult = document.getElementById('aiResult');
                 if (aiResult) aiResult.classList.remove('show');
@@ -1165,5 +1190,6 @@
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
     </script>
+    <script type="module" src="/src/gl-bridge.js"></script>
 </body>
 </html>

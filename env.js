@@ -1,9 +1,9 @@
 /**
- * 환경 변수 설정
- * Vercel 배포 시 환경 변수가 자동으로 주입됩니다
+ * 빌드 시 Vite가 VITE_* 를 주입합니다.
+ * gl-server 정적 호스팅 시 빌드: VITE_POCKETBASE_URL=https://pb.example.com npm run build
  */
 
 window.ENV = {
-    SUPABASE_URL: import.meta.env?.VITE_SUPABASE_URL || process.env.SUPABASE_URL || '',
-    SUPABASE_ANON_KEY: import.meta.env?.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || ''
+  POCKETBASE_URL:
+    import.meta.env?.VITE_POCKETBASE_URL || process.env.VITE_POCKETBASE_URL || ''
 };

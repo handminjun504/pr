@@ -1,21 +1,19 @@
 /**
- * 경리업무를잘하는청년들 - 서비스 소개서 생성기 (Supabase 연동 버전)
- * 메인 애플리케이션 스크립트
+ * 경리업무를잘하는청년들 - 서비스 소개서 생성기 (PocketBase / gl 연동 — 모듈 엔트리용)
  */
 
-import { 
-    supabase, 
-    isConnected, 
+import {
+    isConnected,
     checkConnection,
-    getServices, 
+    getServices,
     createProposalClient,
     searchClients,
     createProposal,
     updateProposal,
     getProposals,
     saveServiceSelections,
-    formatError 
-} from './lib/supabase.js';
+    formatError
+} from './lib/gl-db.js';
 
 // ============================================
 // 전역 상태 관리
@@ -30,7 +28,7 @@ const AppState = {
     defaultServiceData: null,
     currentProposalId: null, // 현재 편집 중인 제안서 ID
     currentClientId: null,    // 현재 선택된 고객사 ID
-    useSupabase: false        // Supabase 사용 여부
+    useGl: false // PocketBase(gl) 연결 성공 시 true
 };
 
 // ============================================
@@ -39,16 +37,16 @@ const AppState = {
 
 document.addEventListener('DOMContentLoaded', async function() {
     try {
-        // Supabase 연결 확인
+        // PocketBase(gl) 연결 확인
         if (isConnected()) {
             const connectionStatus = await checkConnection();
             if (connectionStatus.connected) {
-                AppState.useSupabase = true;
-                await loadServiceDataFromSupabase();
-                showToast('☁️ 클라우드 연결됨', 'success');
+                AppState.useGl = true;
+                await loadServiceDataFromGl();
+                showToast('GL 연결됨', 'success');
                 updateConnectionStatus(true);
             } else {
-                console.warn('Supabase 연결 실패:', connectionStatus.error);
+                console.warn('PocketBase 연결 실패:', connectionStatus.error);
                 await loadServiceDataLocal();
                 showToast('💾 로컬 모드로 실행 중', 'info');
                 updateConnectionStatus(false);
@@ -64,8 +62,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         // 고객사 검색 이벤트 추가
         setupClientSearch();
         
-        // 제안서 목록 로드 (Supabase 사용 시)
-        if (AppState.useSupabase) {
+        // 제안서 목록 로드 (GL 연결 시)
+        if (AppState.useGl) {
             await loadProposalsList();
         }
     } catch (error) {
@@ -97,7 +95,7 @@ function updateConnectionStatus(connected) {
         background: ${connected ? '#27ae60' : 'rgba(255,255,255,0.1)'};
         color: white;
     `;
-    statusEl.textContent = connected ? '☁️ Cloud' : '💾 Local';
+    statusEl.textContent = connected ? 'GL' : '💾 Local';
     header.prepend(statusEl);
 }
 
@@ -105,7 +103,7 @@ function updateConnectionStatus(connected) {
 // 서비스 데이터 로드
 // ============================================
 
-async function loadServiceDataFromSupabase() {
+async function loadServiceDataFromGl() {
     try {
         const data = await getServices();
         AppState.defaultServiceData = JSON.parse(JSON.stringify(data));
@@ -119,9 +117,9 @@ async function loadServiceDataFromSupabase() {
             AppState.serviceData = data;
         }
         
-        console.log('✅ Supabase에서 서비스 데이터 로드 완료');
+        console.log('✅ GL에서 서비스 데이터 로드 완료');
     } catch (error) {
-        console.error('Supabase 데이터 로드 실패:', error);
+        console.error('GL 데이터 로드 실패:', error);
         throw error;
     }
 }
@@ -166,7 +164,7 @@ function getFallbackServiceData() {
 
 function setupClientSearch() {
     const companyInput = document.getElementById('companyName');
-    if (!companyInput || !AppState.useSupabase) return;
+    if (!companyInput || !AppState.useGl) return;
     
     let searchTimeout;
     const searchResults = document.createElement('div');
@@ -277,7 +275,7 @@ function selectClient(client) {
 // ============================================
 
 async function loadProposalsList() {
-    if (!AppState.useSupabase) return;
+    if (!AppState.useGl) return;
     
     try {
         const proposals = await getProposals();
@@ -306,7 +304,7 @@ function loadSavedData() {
         }
     }
 
-    if (!AppState.useSupabase) {
+    if (!AppState.useGl) {
         const savedServiceData = localStorage.getItem('serviceData');
         if (savedServiceData) {
             try {
@@ -352,7 +350,7 @@ function applySavedContent() {
 }
 
 function saveServiceData() {
-    if (!AppState.useSupabase) {
+    if (!AppState.useGl) {
         localStorage.setItem('serviceData', JSON.stringify(AppState.serviceData));
     }
 }
@@ -378,12 +376,12 @@ function autoSave() {
     AppState.saveTimeout = setTimeout(async () => {
         saveAllContent();
         
-        // Supabase에도 저장 (현재 제안서가 있을 경우)
-        if (AppState.useSupabase && AppState.currentProposalId) {
+        // GL(PocketBase)에도 저장 (현재 제안서가 있을 경우)
+        if (AppState.useGl && AppState.currentProposalId) {
             try {
-                await saveProposalToSupabase();
+                await saveProposalToGl();
             } catch (error) {
-                console.error('Supabase 저장 실패:', error);
+                console.error('GL 저장 실패:', error);
             }
         }
         
@@ -391,7 +389,7 @@ function autoSave() {
     }, 1500);
 }
 
-async function saveProposalToSupabase() {
+async function saveProposalToGl() {
     if (!AppState.currentProposalId) return;
     
     const customContent = {};
@@ -426,11 +424,11 @@ async function manualSave() {
     updateSaveStatus('saving');
     saveAllContent();
     
-    if (AppState.useSupabase) {
+    if (AppState.useGl) {
         try {
             // 새 제안서 생성 또는 기존 제안서 업데이트
             await createOrUpdateProposal();
-            showToast('☁️ 클라우드에 저장되었습니다!', 'success');
+            showToast('GL에 저장되었습니다', 'success');
         } catch (error) {
             console.error('저장 실패:', error);
             showToast('저장 중 오류 발생: ' + formatError(error), 'error');
@@ -509,7 +507,7 @@ function updateSaveStatus(status) {
     if (status === 'saving') {
         textEl.textContent = '저장 중...';
     } else if (status === 'saved') {
-        const mode = AppState.useSupabase ? '☁️' : '💾';
+        const mode = AppState.useGl ? 'GL' : '💾';
         textEl.textContent = `${mode} 저장 완료 (` + new Date().toLocaleTimeString('ko-KR', {hour: '2-digit', minute: '2-digit'}) + ')';
     } else {
         textEl.textContent = '수정 내용이 자동 저장됩니다';

@@ -1,0 +1,56 @@
+[
+  {
+    "name": "gc_proposal_services",
+    "type": "base",
+    "fields": [
+      { "name": "service_id", "type": "text", "required": true },
+      { "name": "category", "type": "text", "required": true },
+      { "name": "title", "type": "text", "required": true },
+      { "name": "icon", "type": "text", "required": false },
+      { "name": "method", "type": "text", "required": true },
+      { "name": "detail", "type": "editor", "required": true },
+      { "name": "effect", "type": "text", "required": true },
+      { "name": "sample", "type": "text", "required": false },
+      { "name": "is_active", "type": "bool", "required": false },
+      { "name": "sort_order", "type": "number", "required": false }
+    ],
+    "listRule": "",
+    "viewRule": "",
+    "createRule": "",
+    "updateRule": "",
+    "deleteRule": ""
+  },
+  {
+    "name": "gc_proposal_clients",
+    "type": "base",
+    "fields": [
+      { "name": "company_name", "type": "text", "required": true },
+      { "name": "contact_name", "type": "text", "required": false },
+      { "name": "industry_type", "type": "text", "required": false },
+      { "name": "phone", "type": "text", "required": false },
+      { "name": "email", "type": "email", "required": false },
+      { "name": "legacy_supabase_id", "type": "number", "required": false }
+    ],
+    "listRule": "",
+    "viewRule": "",
+    "createRule": "",
+    "updateRule": "",
+    "deleteRule": ""
+  },
+  {
+    "name": "gc_proposal_templates",
+    "type": "base",
+    "fields": [
+      { "name": "name", "type": "text", "required": true },
+      { "name": "payload", "type": "json", "required": false },
+      { "name": "is_default", "type": "bool", "required": false },
+      { "name": "usage_count", "type": "number", "required": false },
+      { "name": "legacy_supabase_id", "type": "number", "required": false }
+    ],
+    "listRule": "",
+    "viewRule": "",
+    "createRule": "",
+    "updateRule": "",
+    "deleteRule": ""
+  }
+]
