@@ -49,5 +49,3 @@ ehthumbs_vista.db
 *.backup
 *_backup.*
 
-# Vercel
-.vercel

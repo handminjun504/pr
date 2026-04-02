@@ -35,7 +35,7 @@ VITE_POCKETBASE_URL=https://your-pb.example.com npm run build
 | 프론트 | Vite, `lib/gl-db.js`, `app.js`, `index.html` / `src/gl-bridge.js` |
 | 환경 변수 | **`VITE_POCKETBASE_URL`** 만 필수(빌드·개발 시). 런타임 `window.ENV`에 반영됨 (`env.js`) |
 
-스키마·시드·(선택) 레거시 이관 절차는 [gl-migration/MIGRATION.md](gl-migration/MIGRATION.md) 를 참고하세요.
+스키마·시드 절차는 [gl-migration/MIGRATION.md](gl-migration/MIGRATION.md) 를 참고하세요.
 
 ---
 
@@ -47,23 +47,10 @@ VITE_POCKETBASE_URL=https://your-pb.example.com npm run build
 
 ---
 
-## 선택: 예전 Supabase 데이터 이관
-
-과거 Supabase에만 테이블이 있을 때만 사용합니다.
-
-```bash
-cp .env.migrate.example .env.migrate   # 값 입력, 커밋 금지
-npm run migrate:legacy-supabase-to-gl
-```
-
-신규 구축이면 PB에 스키마·시드만 적용하면 됩니다.
-
----
-
 ## 문서
 
 - [DEPLOYMENT.md](DEPLOYMENT.md) — 배포·환경 변수 요약
-- [gl-migration/MIGRATION.md](gl-migration/MIGRATION.md) — PB 스키마·시드·레거시 이관
+- [gl-migration/MIGRATION.md](gl-migration/MIGRATION.md) — PocketBase 스키마·시드
 
 ---
 
