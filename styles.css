@@ -1301,7 +1301,8 @@ body {
         margin-bottom: 0 !important;
         min-height: 90vh !important;
         display: flex !important;
-        align-items: center !important;
+        flex-direction: column !important;
+        justify-content: flex-start !important;
         padding: 40px !important;
     }
     
@@ -1318,8 +1319,9 @@ body {
     
     /* 서비스 박스 이미지 칸 스타일 (인쇄용) */
     #selectedServicesContent .service-box-image {
-        width: 380px !important;
-        height: 480px !important;
+        width: 100% !important;
+        max-height: 55vh !important;
+        height: auto !important;
     }
     
     /* 경청 추천 서비스 구분 페이지 (인쇄용) */
@@ -1516,23 +1518,21 @@ body {
     gap: 20px;
 }
 
-/* 서비스 박스 내부 레이아웃 */
+/* 서비스 박스 내부 레이아웃 — 상단 설명 + 하단 이미지 */
 .service-box-inner {
     display: flex;
-    gap: 40px;
-    align-items: stretch;
+    flex-direction: column;
+    gap: 24px;
     width: 100%;
 }
 
 .service-box-content {
-    flex: 1;
-    min-width: 0;
+    width: 100%;
 }
 
 .service-box-image {
-    width: 380px;
-    height: 480px;
-    flex-shrink: 0;
+    width: 100%;
+    max-height: 520px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1545,14 +1545,15 @@ body {
 
 .service-box-image img {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    height: auto;
+    max-height: 520px;
+    object-fit: contain;
     border-radius: 10px;
 }
 
 /* 이미지가 없을 때 플레이스홀더 */
 .service-box-image:empty::before {
-    content: "📷\A이미지 영역\A(380×480px)";
+    content: "📷\A이미지 영역";
     white-space: pre-line;
     text-align: center;
     color: #94a3b8;
@@ -1645,8 +1646,8 @@ body {
 
 #selectedServicesContent .service-box-inner {
     display: flex;
-    gap: 40px;
-    align-items: stretch;
+    flex-direction: column;
+    gap: 24px;
 }
 
 /* 인쇄 시 스타일 */
@@ -1676,34 +1677,31 @@ body {
         break-before: auto !important;
     }
     
-    /* 서비스 박스 내부를 좌우 배치 */
+    /* 서비스 박스 내부를 상단 설명 + 하단 이미지 */
     .service-box-inner {
         display: flex !important;
-        gap: 40px !important;
-        align-items: center !important;
+        flex-direction: column !important;
+        gap: 24px !important;
     }
     
     .service-box-content {
-        flex: 1 !important;
+        width: 100% !important;
     }
     
-    /* 이미지 표시 */
+    /* 이미지 하단 크게 */
     .service-box-image {
         display: block !important;
-        width: 420px !important;
-        flex-shrink: 0 !important;
+        width: 100% !important;
+        max-height: 55vh !important;
     }
     
     .service-box-image img {
         width: 100% !important;
         height: auto !important;
+        max-height: 55vh !important;
+        object-fit: contain !important;
         border-radius: 12px !important;
         box-shadow: 0 6px 20px rgba(0,0,0,0.15) !important;
-    }
-    
-    /* 서비스 박스 내부 간격 */
-    .service-box-inner {
-        gap: 50px !important;
     }
     
     /* 서비스 헤더 크게 */
