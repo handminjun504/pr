@@ -7,8 +7,10 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "migrate:legacy-supabase-to-gl": "node scripts/full-migrate-to-gl.mjs",
     "upload:service-images": "node scripts/upload-service-images.mjs",
-    "sync:service-images": "node scripts/sync-service-images-to-public.mjs"
+    "sync:service-images": "node scripts/sync-service-images-to-public.mjs",
+    "fix:image-urls": "node scripts/fix-image-urls.mjs"
   },
   "keywords": [
     "proposal",
