@@ -873,7 +873,11 @@
 
         function resolveServiceImageSrc(serviceId, data) {
             const u = data && data.image_url;
-            if (typeof u === 'string' && u.trim()) return u.trim();
+            if (typeof u === 'string' && u.trim()) {
+                const v = u.trim();
+                if (/^https?:\/\//i.test(v) || v.startsWith('./') || v.startsWith('/')) return v;
+                return `./images/${v}`;
+            }
             return `./images/${serviceId}.png`;
         }
 
