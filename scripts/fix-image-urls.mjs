@@ -34,7 +34,13 @@ function loadEnvFile(name) {
 
 loadEnvFile('.env.migrate');
 
-const PB_URL = (process.env.POCKETBASE_URL || '').replace(/\/$/, '');
+/** Node에서 localhost → ::1 로 잡혀 PocketBase(IPv4만)와 맞지 않는 경우 방지 */
+function normalizePocketBaseUrl(raw) {
+  const trimmed = (raw || '').replace(/\/$/, '');
+  return trimmed.replace(/^http:\/\/localhost\b/i, 'http://127.0.0.1').replace(/^https:\/\/localhost\b/i, 'https://127.0.0.1');
+}
+
+const PB_URL = normalizePocketBaseUrl(process.env.POCKETBASE_URL || '');
 const EMAIL = process.env.POCKETBASE_ADMIN_EMAIL || '';
 const PASS = process.env.POCKETBASE_ADMIN_PASSWORD || '';
 
@@ -46,14 +52,37 @@ if (!PB_URL || !EMAIL || !PASS) {
 const COL = 'gc_proposal_services';
 const PUBLIC_IMAGES = path.join(root, 'public', 'images');
 
+async function checkReachable(baseUrl) {
+  const healthUrl = `${baseUrl}/api/health`;
+  let res;
+  const ac = new AbortController();
+  const t = setTimeout(() => ac.abort(), 15_000);
+  try {
+    res = await fetch(healthUrl, { signal: ac.signal });
+  } catch (err) {
+    throw new Error(`HTTP 요청 실패 (${healthUrl}): ${err?.message || err}`);
+  } finally {
+    clearTimeout(t);
+  }
+  const text = await res.text();
+  if (!res.ok) {
+    throw new Error(`HTTP ${res.status} (${healthUrl}): ${text.slice(0, 500)}`);
+  }
+  return text;
+}
+
 async function main() {
+  console.log('[fix:image-urls] POCKETBASE_URL =', PB_URL);
+
   const pb = new PocketBase(PB_URL);
   pb.autoCancellation(false);
 
   try {
-    await pb.health.check();
+    await checkReachable(PB_URL);
   } catch (e) {
-    console.error('PocketBase 연결 실패:', PB_URL, e?.message || e);
+    console.error('PocketBase 연결 실패:', e?.message || e);
+    console.error('  → 같은 PC에서 PowerShell이면: $env:POCKETBASE_URL="http://127.0.0.1:8090"');
+    console.error('  → .env.migrate 의 PB 주소가 192.168.x.x 면 방화벽·NIC 문제일 수 있음. 127.0.0.1:8090 권장');
     process.exit(1);
   }
 
