@@ -14,10 +14,11 @@ import PocketBase from 'pocketbase';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, '..');
 
-function loadEnvFile(name) {
+/** migrate 전용: 파일이 있으면 키가 정의된 항목은 항상 적용 (setx 로 남은 잘못된 URL 이 실제 파일보다 우선되던 문제 방지) */
+function loadEnvFileMigrate(name) {
   const p = path.join(root, name);
-  if (!fs.existsSync(p)) return;
-  const text = fs.readFileSync(p, 'utf8');
+  if (!fs.existsSync(p)) return { path: p, loaded: false };
+  const text = fs.readFileSync(p, 'utf8').replace(/^\uFEFF/, '');
   for (const line of text.split('\n')) {
     const t = line.trim();
     if (!t || t.startsWith('#')) continue;
@@ -28,11 +29,12 @@ function loadEnvFile(name) {
     if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) {
       v = v.slice(1, -1);
     }
-    if (!process.env[k]) process.env[k] = v;
+    if (v !== '') process.env[k] = v;
   }
+  return { path: p, loaded: true };
 }
 
-loadEnvFile('.env.migrate');
+const migrateEnv = loadEnvFileMigrate('.env.migrate');
 
 /** Node에서 localhost → ::1 로 잡혀 PocketBase(IPv4만)와 맞지 않는 경우 방지 */
 function normalizePocketBaseUrl(raw) {
@@ -40,12 +42,18 @@ function normalizePocketBaseUrl(raw) {
   return trimmed.replace(/^http:\/\/localhost\b/i, 'http://127.0.0.1').replace(/^https:\/\/localhost\b/i, 'https://127.0.0.1');
 }
 
-const PB_URL = normalizePocketBaseUrl(process.env.POCKETBASE_URL || '');
-const EMAIL = process.env.POCKETBASE_ADMIN_EMAIL || '';
-const PASS = process.env.POCKETBASE_ADMIN_PASSWORD || '';
+const PB_URL = normalizePocketBaseUrl((process.env.POCKETBASE_URL || '').trim());
+const EMAIL = (process.env.POCKETBASE_ADMIN_EMAIL || '').trim();
+const PASS = (process.env.POCKETBASE_ADMIN_PASSWORD || '').trim();
 
 if (!PB_URL || !EMAIL || !PASS) {
   console.error('POCKETBASE_URL, POCKETBASE_ADMIN_EMAIL, POCKETBASE_ADMIN_PASSWORD 필요 (.env.migrate 권장)');
+  if (!migrateEnv.loaded) console.error('  → 없음:', migrateEnv.path);
+  process.exit(1);
+}
+
+if (typeof fetch === 'undefined') {
+  console.error('Node 18+ 필요 (전역 fetch). 현재:', process.version);
   process.exit(1);
 }
 
@@ -71,28 +79,71 @@ async function checkReachable(baseUrl) {
   return text;
 }
 
+function logPbErr(label, err) {
+  console.error(`  → ${label}:`, err?.message || err);
+  if (err?.status != null) console.error('     HTTP status:', err.status);
+  if (err?.url) console.error('     요청 URL:', err.url);
+  if (err?.response && Object.keys(err.response).length) {
+    console.error('     응답:', JSON.stringify(err.response));
+  }
+}
+
+async function pickReachableBase(candidates) {
+  const errors = [];
+  for (const base of candidates) {
+    if (!base) continue;
+    try {
+      await checkReachable(base);
+      return base;
+    } catch (e) {
+      errors.push(`${base}: ${e?.message || e}`);
+    }
+  }
+  throw new Error(errors.join(' | '));
+}
+
 async function main() {
+  console.log('[fix:image-urls] cwd =', process.cwd());
+  console.log('[fix:image-urls] .env.migrate =', migrateEnv.loaded ? migrateEnv.path : '(없음, 환경변수만 사용)');
   console.log('[fix:image-urls] POCKETBASE_URL =', PB_URL);
 
-  const pb = new PocketBase(PB_URL);
-  pb.autoCancellation(false);
+  const fallbackBases = [
+    PB_URL,
+    normalizePocketBaseUrl('http://127.0.0.1:8090'),
+    'http://127.0.0.1:8090'
+  ];
+  const uniqueBases = [...new Set(fallbackBases)];
 
+  let baseUrl;
   try {
-    await checkReachable(PB_URL);
+    baseUrl = await pickReachableBase(uniqueBases);
   } catch (e) {
-    console.error('PocketBase 연결 실패:', e?.message || e);
-    console.error('  → 같은 PC에서 PowerShell이면: $env:POCKETBASE_URL="http://127.0.0.1:8090"');
-    console.error('  → .env.migrate 의 PB 주소가 192.168.x.x 면 방화벽·NIC 문제일 수 있음. 127.0.0.1:8090 권장');
+    console.error('PocketBase /api/health 실패 (시도한 URL):', uniqueBases.join(', '));
+    console.error('  세부:', e?.message || e);
+    console.error('  → PC에서 curl http://127.0.0.1:8090/api/health 가 되면, setx 로 POCKETBASE_URL 이 다른 값이면 이전에 .env.migrate 가 무시됐을 수 있음 → 스크립트는 이제 .env.migrate 가 우선합니다. git pull 후 다시 실행하세요.');
     process.exit(1);
   }
 
+  if (baseUrl !== PB_URL) {
+    console.log('[fix:image-urls] 연결에 성공한 주소로 전환:', baseUrl, '(설정값과 다름)');
+  }
+
+  const pb = new PocketBase(baseUrl);
+  pb.autoCancellation(false);
+
+  let superErr;
   try {
     await pb.collection('_superusers').authWithPassword(EMAIL, PASS);
-  } catch {
+  } catch (e) {
+    superErr = e;
+  }
+  if (!pb.authStore.isValid) {
     try {
       await pb.admins.authWithPassword(EMAIL, PASS);
-    } catch (e) {
-      console.error('관리자 로그인 실패:', e?.message || e);
+    } catch (adminErr) {
+      console.error('연결(/api/health)은 성공했습니다. 아래는 관리자 로그인 실패입니다.');
+      logPbErr('_superusers', superErr);
+      logPbErr('admins (구버전)', adminErr);
       process.exit(1);
     }
   }
