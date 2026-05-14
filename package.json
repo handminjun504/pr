@@ -4,6 +4,7 @@
   "description": "경리업무를잘하는청년들 서비스 제안서 생성기",
   "type": "module",
   "scripts": {
+    "start": "vite",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
